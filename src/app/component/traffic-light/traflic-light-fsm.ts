@@ -39,6 +39,25 @@ export class TraflicLightFSM extends BasicFSMObject {
     super();
     // console.log('EventDictionary', TraflicLightFSM.EventDictionary);
     // console.log('GuardDictionary', TraflicLightFSM.GuardDictionary);
+    this.setupClear();
+  }
+
+  setupClear() {
+    this.StateChange.subscribe(e => {
+      switch (e.to) {
+        case LightStatus.Green:
+          this.ExtendedStates.InGreenTime = 0;
+          break;
+
+        case LightStatus.Yellow:
+          this.ExtendedStates.InYellowTime = 0;
+          break;
+
+        case LightStatus.Red:
+          this.ExtendedStates.InRedTime = 0;
+          break;
+      }
+    });
   }
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
