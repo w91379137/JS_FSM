@@ -1,4 +1,6 @@
 
+import { Subject } from 'rxjs';
+
 /*
 目前先設計
 狀態列表 需要在建立時 就準備好 不能變更
@@ -7,11 +9,12 @@
 export class BasicFSMObject {
 
   // State(只能透過 Events 更改)
-  protected static AllState: any[] = []; // 給子類自己選擇要哪個 enum
+  static AllState: any[] = []; // 給子類自己選擇要哪個 enum
   static EventDictionary = {};
   static GuardDictionary = {};
 
-  protected State: any; // 給子類自己選擇要哪個 enum
+  State: any; // 給子類自己選擇要哪個 enum
+  StateChange = new Subject<{ from: any, to: any }>();
 
   // Extended states(只能透過 Events 更改)
   protected ExtendedStates: any = {}; // 其他可以觀察屬性

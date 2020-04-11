@@ -1,5 +1,6 @@
 import { BasicFSMObject } from '../../share/basic-fsm-object';
-import { Event, Guard } from 'src/app/share/basic-fsm-decorator';
+import { Event, Guard, State } from 'src/app/share/basic-fsm-decorator';
+import { Subject } from 'rxjs';
 
 enum LightStatus {
   Green = 0,
@@ -19,7 +20,10 @@ export class TraflicLightFSM extends BasicFSMObject {
     .map(key => LightStatus[key])
     .filter(value => !isNaN(Number(value))); // 取出所有狀態
 
+  @State()
   State = LightStatus.Green;
+
+  StateChange = new Subject<{ from: LightStatus, to: LightStatus }>();
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // Extended states

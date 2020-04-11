@@ -6,6 +6,31 @@ function oneToArr(obj: any) {
   return Array.isArray(obj) ? obj : [obj];
 }
 
+export function State() {
+  return function EStateFactory(
+    target: any,
+    propertyKey: string | symbol,
+  ) {
+
+    let val = target[propertyKey];
+
+    const getter = function newGetter() {
+      return val;
+    };
+    const setter = function newSetter(next) {
+      this.StateChange.next({ from: val, to: next });
+      val = next;
+    };
+
+    Object.defineProperty(target, propertyKey, {
+      get: getter,
+      set: setter,
+      enumerable: true,
+      configurable: true,
+    });
+  };
+}
+
 export function Event(
   inState: any | any[],
 ) {

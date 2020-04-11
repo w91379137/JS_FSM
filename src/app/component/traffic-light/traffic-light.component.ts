@@ -16,14 +16,16 @@ export class TrafficLightComponent implements OnInit {
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
 
   constructor() {
-
+    this.fsm.StateChange.subscribe(e => {
+      console.log(e);
+    });
   }
 
   ngOnInit() {
     // console.log(TraflicLightFSM.AllState);
 
-    const timer = interval(100)
-      .pipe(take(30))
+    const timer = interval(50)
+      .pipe(take(50))
       .subscribe(_ => {
         console.log(this.fsm.State);
         // console.log(this.fsm.ExtendedStates);
