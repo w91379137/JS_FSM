@@ -1,4 +1,5 @@
 import { BasicFSMObject } from '../../share/basic-fsm-object';
+import { checkIn } from 'src/app/share/basic-fsm-decorator';
 
 enum LightStatus {
   Green = 0,
@@ -12,6 +13,7 @@ const RedTime = 10;
 
 export class TraflicLightFSM extends BasicFSMObject {
 
+  // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // State
   static AllState = Object.keys(LightStatus)
     .map(key => LightStatus[key])
@@ -19,6 +21,7 @@ export class TraflicLightFSM extends BasicFSMObject {
 
   State = LightStatus.Green;
 
+  // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // Extended states
   ExtendedStates = {
     InGreenTime: 0, // 在 綠燈秒數
@@ -26,38 +29,44 @@ export class TraflicLightFSM extends BasicFSMObject {
     InRedTime: 0, // 在 紅燈秒數
   };
 
+  // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // Events
-  increaseTime() {
+  @checkIn([LightStatus.Green, LightStatus.Yellow, LightStatus.Red])
+  increaseTime(): boolean {
     switch (this.State) {
       case LightStatus.Green:
-        this.increaseGreenTime();
-        break;
+        return this.increaseGreenTime();
 
       case LightStatus.Yellow:
-        this.increaseYellowTime();
-        break;
+        return this.increaseYellowTime();
 
       case LightStatus.Red:
-        this.increaseRedTime();
-        break;
+        return this.increaseRedTime();
     }
   }
 
-  increaseGreenTime() {
+  @checkIn(LightStatus.Green)
+  increaseGreenTime(): boolean {
     this.ExtendedStates.InGreenTime++;
     this.checkAll();
+    return true;
   }
 
-  increaseYellowTime() {
+  @checkIn(LightStatus.Yellow)
+  increaseYellowTime(): boolean {
     this.ExtendedStates.InYellowTime++;
     this.checkAll();
+    return true;
   }
 
-  increaseRedTime() {
+  @checkIn(LightStatus.Red)
+  increaseRedTime(): boolean {
     this.ExtendedStates.InRedTime++;
     this.checkAll();
+    return true;
   }
 
+  // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // Guard conditions
   isInGreenTimeFull() {
     return this.ExtendedStates.InGreenTime >= GreenTime;
@@ -71,6 +80,7 @@ export class TraflicLightFSM extends BasicFSMObject {
     return this.ExtendedStates.InRedTime >= RedTime;
   }
 
+  // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   checkAll() {
     switch (this.State) {
       case LightStatus.Green:

@@ -16,6 +16,8 @@ export class BasicFSMObject {
 
   // Events(應該要 跟狀態有關 有些可以執行)
   // 表現在哪些狀態 才能執行
+  // 回應是否 執行
+  // 執行之後 自動檢查
 
   // Guard conditions(應該要 跟狀態有關 有些可以執行)
   // 表現在哪些狀態 才能檢查
