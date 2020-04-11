@@ -1,5 +1,5 @@
 import { BasicFSMObject } from '../../share/basic-fsm-object';
-import { Event } from 'src/app/share/basic-fsm-decorator';
+import { Event, Guard } from 'src/app/share/basic-fsm-decorator';
 
 enum LightStatus {
   Green = 0,
@@ -68,14 +68,17 @@ export class TraflicLightFSM extends BasicFSMObject {
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // Guard conditions
+  @Guard(LightStatus.Green, LightStatus.Yellow)
   isInGreenTimeFull() {
     return this.ExtendedStates.InGreenTime >= GreenTime;
   }
 
+  @Guard(LightStatus.Yellow, LightStatus.Red)
   isInYellowTimeFull() {
     return this.ExtendedStates.InYellowTime >= YellowTime;
   }
 
+  @Guard(LightStatus.Red, LightStatus.Green)
   isInRedTimeFull() {
     return this.ExtendedStates.InRedTime >= RedTime;
   }
@@ -84,25 +87,15 @@ export class TraflicLightFSM extends BasicFSMObject {
   checkAll() {
     switch (this.State) {
       case LightStatus.Green:
-        if (this.isInGreenTimeFull()) {
-          this.ExtendedStates.InYellowTime = 0;
-          this.State = LightStatus.Yellow;
-        }
+        this.isInGreenTimeFull();
         break;
 
       case LightStatus.Yellow:
-        if (this.isInYellowTimeFull()) {
-          this.ExtendedStates.InRedTime = 0;
-          this.State = LightStatus.Red;
-        }
+        this.isInYellowTimeFull();
         break;
 
       case LightStatus.Red:
-        if (this.isInRedTimeFull()) {
-
-          this.ExtendedStates.InGreenTime = 0;
-          this.State = LightStatus.Green;
-        }
+        this.isInRedTimeFull();
         break;
     }
   }
