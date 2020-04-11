@@ -12,14 +12,17 @@ export function State() {
     propertyKey: string | symbol,
   ) {
 
-    let val = target[propertyKey];
-
+    const val = target[propertyKey];
     const getter = function newGetter() {
-      return val;
+      if (this.pState === undefined) {
+        this.pState = val;
+      }
+      return this.pState;
     };
     const setter = function newSetter(next) {
-      this.StateChange.next({ from: val, to: next });
-      val = next;
+      const old = this.pState;
+      this.pState = next;
+      this.StateChange.next({ from: old, to: next });
     };
 
     Object.defineProperty(target, propertyKey, {
