@@ -33,7 +33,11 @@ export class BasicFSMObject {
     const funcNameList = this.constructor['GuardDictionary'][this.State];
     for (const funcName of funcNameList) {
       const func = this[funcName];
-      func.apply(this);
+      if (func) {
+        func.apply(this);
+      } else {
+        console.log(this, funcName);
+      }
     }
   }
 

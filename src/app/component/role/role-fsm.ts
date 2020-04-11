@@ -9,11 +9,13 @@ export enum RoleStatus {
   Skill,
   Die,
 }
-
 export class RoleFSM extends BasicFSMObject {
 
-  // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
+  static EventDictionary = {}; // 必須有 不然會共用 super
+  static GuardDictionary = {}; // 必須有 不然會共用 super
 
+  // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
+  // State
   @State()
   State = RoleStatus.Idle;
   StateChange = new Subject<{ from: RoleStatus, to: RoleStatus }>();
@@ -21,46 +23,59 @@ export class RoleFSM extends BasicFSMObject {
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // Extended states
 
+  /** 名稱 */
+  Name = '';
+
+  // 職業
+
   /** 行動值 */
-  ActionPoint = 0;
+  ActionPoint = 100;
 
   /** 生命值 */
-  HealthPoint = 0;
+  HealthPoint = 100;
 
   /** 魔力值 */
-  MagicPoint = 0;
+  MagicPoint = 100;
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // Life Cycle
-  constructor() {
+  constructor(
+    name: string,
+  ) {
     super();
+    this.Name = name;
   }
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // Events
   @Event(RoleStatus.Idle)
-  addActionPoint() {
-
+  addAction(point: number) {
+    this.ActionPoint += point;
+    return true;
   }
 
   @Event(RoleStatus.Action)
   startAttack() {
     console.log('startAttack');
+    return true;
   }
 
   @Event(RoleStatus.Attack)
   endAttack() {
     console.log('endAttack');
+    return true;
   }
 
   @Event(RoleStatus.Action)
   startSkill() {
     console.log('startSkill');
+    return true;
   }
 
   @Event(RoleStatus.Skill)
   endSkill() {
     console.log('endSkill');
+    return true;
   }
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
@@ -71,7 +86,7 @@ export class RoleFSM extends BasicFSMObject {
     return this.ActionPoint >= 100;
   }
 
-  @Guard(RoleStatus.Idle, RoleStatus.Action)
+  @Guard(RoleStatus.Idle, RoleStatus.Die)
   isDie(): boolean {
     return this.HealthPoint <= 0;
   }

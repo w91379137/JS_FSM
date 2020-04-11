@@ -14,6 +14,9 @@ const RedTime = 10;
 
 export class TraflicLightFSM extends BasicFSMObject {
 
+  static EventDictionary = {}; // 必須有 不然會共用 super
+  static GuardDictionary = {}; // 必須有 不然會共用 super
+
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // State
   // static AllState = Object.keys(LightStatus)

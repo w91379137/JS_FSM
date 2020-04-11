@@ -41,6 +41,7 @@ export function Event(
   ) {
     // Write Table
     const dict = target.constructor.EventDictionary;
+    // console.log(target.constructor);
     for (const ele of oneToArr(inState)) {
       const list = dict.hasOwnProperty(ele) ? dict[ele] : [];
       list.push(propertyKey);
@@ -75,6 +76,7 @@ export function Guard(
   ) {
     // Write Table
     const dict = target.constructor.GuardDictionary;
+    // console.log(target.constructor);
     for (const ele of oneToArr(fromState)) {
       const list = dict.hasOwnProperty(ele) ? dict[ele] : [];
       list.push(propertyKey);
