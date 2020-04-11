@@ -2,7 +2,7 @@ import { BasicFSMObject } from '../../share/basic-fsm-object';
 import { Event, Guard, State } from 'src/app/share/basic-fsm-decorator';
 import { Subject } from 'rxjs';
 
-enum LightStatus {
+export enum LightStatus {
   Green = 0,
   Yellow,
   Red,
