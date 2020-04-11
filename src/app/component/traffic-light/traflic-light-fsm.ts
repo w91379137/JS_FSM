@@ -1,5 +1,5 @@
 import { BasicFSMObject } from '../../share/basic-fsm-object';
-import { checkIn } from 'src/app/share/basic-fsm-decorator';
+import { Event } from 'src/app/share/basic-fsm-decorator';
 
 enum LightStatus {
   Green = 0,
@@ -31,7 +31,7 @@ export class TraflicLightFSM extends BasicFSMObject {
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // Events
-  @checkIn([LightStatus.Green, LightStatus.Yellow, LightStatus.Red])
+  @Event([LightStatus.Green, LightStatus.Yellow, LightStatus.Red])
   increaseTime(): boolean {
     switch (this.State) {
       case LightStatus.Green:
@@ -45,21 +45,21 @@ export class TraflicLightFSM extends BasicFSMObject {
     }
   }
 
-  @checkIn(LightStatus.Green)
+  @Event(LightStatus.Green)
   increaseGreenTime(): boolean {
     this.ExtendedStates.InGreenTime++;
     this.checkAll();
     return true;
   }
 
-  @checkIn(LightStatus.Yellow)
+  @Event(LightStatus.Yellow)
   increaseYellowTime(): boolean {
     this.ExtendedStates.InYellowTime++;
     this.checkAll();
     return true;
   }
 
-  @checkIn(LightStatus.Red)
+  @Event(LightStatus.Red)
   increaseRedTime(): boolean {
     this.ExtendedStates.InRedTime++;
     this.checkAll();

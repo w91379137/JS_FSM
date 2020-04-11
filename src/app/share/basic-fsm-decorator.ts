@@ -2,7 +2,7 @@
 // https://www.cnblogs.com/Wayou/p/typescript_decorator.html
 // https://zhongsp.gitbooks.io/typescript-handbook/doc/handbook/Decorators.html
 
-export function checkIn(
+export function Event(
   checkInValue: any | any[],
 ) {
   return function checkFactory(
