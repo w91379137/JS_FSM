@@ -13,33 +13,89 @@ const RedTime = 10;
 export class TraflicLightFSM extends BasicFSMObject {
 
   // State
-  protected static AllState = Object.keys(LightStatus)
+  static AllState = Object.keys(LightStatus)
     .map(key => LightStatus[key])
     .filter(value => !isNaN(Number(value))); // 取出所有狀態
 
-  protected State = LightStatus.Green;
+  State = LightStatus.Green;
 
   // Extended states
-  protected ExtendedStates = {
+  ExtendedStates = {
     InGreenTime: 0, // 在 綠燈秒數
     InYellowTime: 0, // 在 黃燈秒數
     InRedTime: 0, // 在 紅燈秒數
   };
 
   // Events
-  IncreaseGreenTime() {
+  increaseTime() {
+    switch (this.State) {
+      case LightStatus.Green:
+        this.increaseGreenTime();
+        break;
+
+      case LightStatus.Yellow:
+        this.increaseYellowTime();
+        break;
+
+      case LightStatus.Red:
+        this.increaseRedTime();
+        break;
+    }
+  }
+
+  increaseGreenTime() {
     this.ExtendedStates.InGreenTime++;
+    this.checkAll();
   }
 
-  IncreaseYellowTime() {
+  increaseYellowTime() {
     this.ExtendedStates.InYellowTime++;
+    this.checkAll();
   }
 
-  IncreaseRedTime() {
+  increaseRedTime() {
     this.ExtendedStates.InRedTime++;
+    this.checkAll();
   }
 
   // Guard conditions
+  isInGreenTimeFull() {
+    return this.ExtendedStates.InGreenTime >= GreenTime;
+  }
+
+  isInYellowTimeFull() {
+    return this.ExtendedStates.InYellowTime >= YellowTime;
+  }
+
+  isInRedTimeFull() {
+    return this.ExtendedStates.InRedTime >= RedTime;
+  }
+
+  checkAll() {
+    switch (this.State) {
+      case LightStatus.Green:
+        if (this.isInGreenTimeFull()) {
+          this.ExtendedStates.InYellowTime = 0;
+          this.State = LightStatus.Yellow;
+        }
+        break;
+
+      case LightStatus.Yellow:
+        if (this.isInYellowTimeFull()) {
+          this.ExtendedStates.InRedTime = 0;
+          this.State = LightStatus.Red;
+        }
+        break;
+
+      case LightStatus.Red:
+        if (this.isInRedTimeFull()) {
+
+          this.ExtendedStates.InGreenTime = 0;
+          this.State = LightStatus.Green;
+        }
+        break;
+    }
+  }
 
   // Actions and transitions
 }

@@ -20,16 +20,14 @@ export class TrafficLightComponent implements OnInit {
   }
 
   ngOnInit() {
-    // tslint:disable-next-line:no-string-literal
-    console.log(TraflicLightFSM['AllState']);
+    console.log(TraflicLightFSM.AllState);
 
-    const timer = interval(1000)
-      .pipe(take(100))
+    const timer = interval(100)
+      .pipe(take(30))
       .subscribe(_ => {
-        this.fsm.IncreaseGreenTime();
-        // tslint:disable-next-line:no-string-literal
-        console.log(this.fsm['ExtendedStates']);
-
+        console.log(this.fsm.State);
+        // console.log(this.fsm.ExtendedStates);
+        this.fsm.increaseTime();
       });
   }
 
