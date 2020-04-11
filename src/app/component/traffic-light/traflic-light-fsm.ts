@@ -27,11 +27,9 @@ export class TraflicLightFSM extends BasicFSMObject {
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // Extended states
-  ExtendedStates = {
-    InGreenTime: 0, // 在 綠燈秒數
-    InYellowTime: 0, // 在 黃燈秒數
-    InRedTime: 0, // 在 紅燈秒數
-  };
+  InGreenTime = 0; // 在 綠燈秒數
+  InYellowTime = 0; // 在 黃燈秒數
+  InRedTime = 0; // 在 紅燈秒數
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // Life
@@ -46,15 +44,15 @@ export class TraflicLightFSM extends BasicFSMObject {
     this.StateChange.subscribe(e => {
       switch (e.to) {
         case LightStatus.Green:
-          this.ExtendedStates.InGreenTime = 0;
+          this.InGreenTime = 0;
           break;
 
         case LightStatus.Yellow:
-          this.ExtendedStates.InYellowTime = 0;
+          this.InYellowTime = 0;
           break;
 
         case LightStatus.Red:
-          this.ExtendedStates.InRedTime = 0;
+          this.InRedTime = 0;
           break;
       }
     });
@@ -78,19 +76,19 @@ export class TraflicLightFSM extends BasicFSMObject {
 
   @Event(LightStatus.Green)
   increaseGreenTime(): boolean {
-    this.ExtendedStates.InGreenTime++;
+    this.InGreenTime++;
     return true;
   }
 
   @Event(LightStatus.Yellow)
   increaseYellowTime(): boolean {
-    this.ExtendedStates.InYellowTime++;
+    this.InYellowTime++;
     return true;
   }
 
   @Event(LightStatus.Red)
   increaseRedTime(): boolean {
-    this.ExtendedStates.InRedTime++;
+    this.InRedTime++;
     return true;
   }
 
@@ -98,17 +96,17 @@ export class TraflicLightFSM extends BasicFSMObject {
   // Guard conditions
   @Guard(LightStatus.Green, LightStatus.Yellow)
   isInGreenTimeFull(): boolean {
-    return this.ExtendedStates.InGreenTime >= GreenTime;
+    return this.InGreenTime >= GreenTime;
   }
 
   @Guard(LightStatus.Yellow, LightStatus.Red)
   isInYellowTimeFull(): boolean {
-    return this.ExtendedStates.InYellowTime >= YellowTime;
+    return this.InYellowTime >= YellowTime;
   }
 
   @Guard(LightStatus.Red, LightStatus.Green)
   isInRedTimeFull(): boolean {
-    return this.ExtendedStates.InRedTime >= RedTime;
+    return this.InRedTime >= RedTime;
   }
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====

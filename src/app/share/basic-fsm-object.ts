@@ -17,7 +17,7 @@ export class BasicFSMObject {
   StateChange = new Subject<{ from: any, to: any }>();
 
   // Extended states(只能透過 Events 更改)
-  protected ExtendedStates: any = {}; // 其他可以觀察屬性
+  // 其他可以觀察屬性
 
   // Events
   // v 哪種狀態能執行
