@@ -14,11 +14,13 @@ export class BasicFSMObject {
   // Extended states(只能透過 Events 更改)
   protected ExtendedStates: any = {}; // 其他可以觀察屬性
 
+  EventDictionary = {};
   // Events(應該要 跟狀態有關 有些可以執行)
   // 表現在哪些狀態 才能執行
   // 回應是否 執行
   // 執行之後 自動檢查
 
+  GuardDictionary = {};
   // Guard conditions(應該要 跟狀態有關 有些可以執行)
   // 表現在哪些狀態 才能檢查
   // 表現通過後 匯到哪個 狀態
