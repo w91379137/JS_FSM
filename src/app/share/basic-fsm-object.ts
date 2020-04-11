@@ -8,11 +8,11 @@
 export class BasicFSMObject {
 
   // State(只能透過 Events 更改)
-  protected AllState: any[] = []; // 給子類自己選擇要哪個 enum
+  protected static AllState: any[] = []; // 給子類自己選擇要哪個 enum
   protected State: any; // 給子類自己選擇要哪個 enum
 
   // Extended states(只能透過 Events 更改)
-  protected Extendedstates: any = {}; // 其他可以觀察屬性
+  protected ExtendedStates: any = {}; // 其他可以觀察屬性
 
   // Events
   // Guard conditions
