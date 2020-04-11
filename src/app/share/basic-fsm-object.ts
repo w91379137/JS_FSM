@@ -2,7 +2,6 @@
 /*
 目前先設計
 狀態列表 需要在建立時 就準備好 不能變更
-
 */
 
 export class BasicFSMObject {
@@ -17,15 +16,14 @@ export class BasicFSMObject {
   // Extended states(只能透過 Events 更改)
   protected ExtendedStates: any = {}; // 其他可以觀察屬性
 
-  // Events(應該要 跟狀態有關 有些可以執行)
-  // 表現在哪些狀態 才能執行
-  // 回應是否 執行
-  // 執行之後 自動檢查
+  // Events
+  // v 哪種狀態能執行
+  // v 執行之後自動檢查
 
-  // Guard conditions(應該要 跟狀態有關 有些可以執行)
-  // 表現在哪些狀態 才能檢查
-  // 表現通過後 匯到哪個 狀態
-  // 表現未通過的 原因
+  // Guard conditions
+  // v 哪種狀態能檢查
+  // v 通過後到哪個狀態
+  // x log未通過的原因
 
   checkAll() {
     // tslint:disable-next-line:no-string-literal
@@ -36,6 +34,6 @@ export class BasicFSMObject {
     }
   }
 
-  // Actions and transitions
+  // Actions and Transitions
   // 依照事件給予 反應
 }

@@ -89,5 +89,5 @@ export class TraflicLightFSM extends BasicFSMObject {
   }
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
-  // Actions and transitions
+  // Actions and Transitions
 }
