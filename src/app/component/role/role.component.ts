@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
+import { RoleFSM, RoleStatus } from './role-fsm';
 
 @Component({
   selector: 'app-role',
@@ -7,9 +8,19 @@ import { Component, OnInit } from '@angular/core';
 })
 export class RoleComponent implements OnInit {
 
-  constructor() { }
+  RStatus = RoleStatus;
 
-  ngOnInit() {
+  @Input()
+  role: RoleFSM;
+
+  // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
+  constructor() {
+
   }
 
+  ngOnInit() {
+
+  }
+
+  // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
 }
