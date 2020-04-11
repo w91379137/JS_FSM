@@ -7,40 +7,64 @@ function oneToArr(obj: any) {
 }
 
 export function Event(
-  checkInValue: any | any[],
+  inState: any | any[],
 ) {
   return function EventFactory(
     target: any,
     propertyKey: string,
     descriptor: PropertyDescriptor,
   ) {
+    // Write Table
+    const dict = target.constructor.EventDictionary;
+    for (const ele of oneToArr(inState)) {
+      const list = dict.hasOwnProperty(ele) ? dict[ele] : [];
+      list.push(propertyKey);
+      dict[ele] = list;
+    }
+
+    // Replace
     const originalMethod = descriptor.value;
     descriptor.value = function newMethod() {
-      if (!oneToArr(checkInValue).includes(this.State)) {
+      if (!oneToArr(inState).includes(this.State)) {
         return false;
       }
-      return originalMethod.apply(this, arguments);
+
+      const result = originalMethod.apply(this, arguments);
+      if (result) {
+        this.checkAll();
+      }
+
+      return result;
     };
   };
 }
 
 export function Guard(
-  from: any | any[],
-  to: any,
+  fromState: any | any[],
+  toState: any,
 ) {
   return function GuardFactory(
     target: any,
     propertyKey: string,
     descriptor: PropertyDescriptor,
   ) {
+    // Write Table
+    const dict = target.constructor.GuardDictionary;
+    for (const ele of oneToArr(fromState)) {
+      const list = dict.hasOwnProperty(ele) ? dict[ele] : [];
+      list.push(propertyKey);
+      dict[ele] = list;
+    }
+
+    // Replace
     const originalMethod = descriptor.value;
     descriptor.value = function newMethod() {
-      if (!oneToArr(from).includes(this.State)) {
+      if (!oneToArr(fromState).includes(this.State)) {
         return false;
       }
       const result = originalMethod.apply(this, arguments);
       if (result) {
-        this.State = to;
+        this.State = toState;
       }
       return result;
     };

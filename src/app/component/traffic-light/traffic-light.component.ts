@@ -20,7 +20,7 @@ export class TrafficLightComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log(TraflicLightFSM.AllState);
+    // console.log(TraflicLightFSM.AllState);
 
     const timer = interval(100)
       .pipe(take(30))

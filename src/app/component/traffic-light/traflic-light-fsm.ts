@@ -30,6 +30,14 @@ export class TraflicLightFSM extends BasicFSMObject {
   };
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
+  // Life
+  constructor() {
+    super();
+    // console.log('EventDictionary', TraflicLightFSM.EventDictionary);
+    // console.log('GuardDictionary', TraflicLightFSM.GuardDictionary);
+  }
+
+  // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // Events
   @Event([LightStatus.Green, LightStatus.Yellow, LightStatus.Red])
   increaseTime(): boolean {
@@ -48,57 +56,38 @@ export class TraflicLightFSM extends BasicFSMObject {
   @Event(LightStatus.Green)
   increaseGreenTime(): boolean {
     this.ExtendedStates.InGreenTime++;
-    this.checkAll();
     return true;
   }
 
   @Event(LightStatus.Yellow)
   increaseYellowTime(): boolean {
     this.ExtendedStates.InYellowTime++;
-    this.checkAll();
     return true;
   }
 
   @Event(LightStatus.Red)
   increaseRedTime(): boolean {
     this.ExtendedStates.InRedTime++;
-    this.checkAll();
     return true;
   }
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // Guard conditions
   @Guard(LightStatus.Green, LightStatus.Yellow)
-  isInGreenTimeFull() {
+  isInGreenTimeFull(): boolean {
     return this.ExtendedStates.InGreenTime >= GreenTime;
   }
 
   @Guard(LightStatus.Yellow, LightStatus.Red)
-  isInYellowTimeFull() {
+  isInYellowTimeFull(): boolean {
     return this.ExtendedStates.InYellowTime >= YellowTime;
   }
 
   @Guard(LightStatus.Red, LightStatus.Green)
-  isInRedTimeFull() {
+  isInRedTimeFull(): boolean {
     return this.ExtendedStates.InRedTime >= RedTime;
   }
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
-  checkAll() {
-    switch (this.State) {
-      case LightStatus.Green:
-        this.isInGreenTimeFull();
-        break;
-
-      case LightStatus.Yellow:
-        this.isInYellowTimeFull();
-        break;
-
-      case LightStatus.Red:
-        this.isInRedTimeFull();
-        break;
-    }
-  }
-
   // Actions and transitions
 }

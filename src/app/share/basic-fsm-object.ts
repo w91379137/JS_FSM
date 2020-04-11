@@ -9,22 +9,32 @@ export class BasicFSMObject {
 
   // State(只能透過 Events 更改)
   protected static AllState: any[] = []; // 給子類自己選擇要哪個 enum
+  static EventDictionary = {};
+  static GuardDictionary = {};
+
   protected State: any; // 給子類自己選擇要哪個 enum
 
   // Extended states(只能透過 Events 更改)
   protected ExtendedStates: any = {}; // 其他可以觀察屬性
 
-  EventDictionary = {};
   // Events(應該要 跟狀態有關 有些可以執行)
   // 表現在哪些狀態 才能執行
   // 回應是否 執行
   // 執行之後 自動檢查
 
-  GuardDictionary = {};
   // Guard conditions(應該要 跟狀態有關 有些可以執行)
   // 表現在哪些狀態 才能檢查
   // 表現通過後 匯到哪個 狀態
   // 表現未通過的 原因
+
+  checkAll() {
+    // tslint:disable-next-line:no-string-literal
+    const funcNameList = this.constructor['GuardDictionary'][this.State];
+    for (const funcName of funcNameList) {
+      const func = this[funcName];
+      func.apply(this);
+    }
+  }
 
   // Actions and transitions
   // 依照事件給予 反應
