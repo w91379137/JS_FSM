@@ -4,11 +4,13 @@ import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { TrafficLightComponent } from './component/traffic-light/traffic-light.component';
+import { RoleComponent } from './component/role/role.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    TrafficLightComponent
+    TrafficLightComponent,
+    RoleComponent
   ],
   imports: [
     BrowserModule,

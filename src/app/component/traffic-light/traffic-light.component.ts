@@ -12,7 +12,7 @@ import { take } from 'rxjs/operators';
 export class TrafficLightComponent implements OnInit {
 
   TLightStatus = LightStatus;
-  fsm = new TraflicLightFSM();
+  traflicLight = new TraflicLightFSM();
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
 
@@ -30,7 +30,7 @@ export class TrafficLightComponent implements OnInit {
       .subscribe(_ => {
         // console.log(this.fsm.State);
         // console.log(this.fsm.ExtendedStates);
-        this.fsm.increaseTime();
+        this.traflicLight.increaseTime();
       });
   }
 
