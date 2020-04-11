@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { RoleFSM } from 'src/app/component/role/role-fsm';
+import { RoleFSM, RoleStatus } from 'src/app/component/role/role-fsm';
 import { interval } from 'rxjs';
 import { take } from 'rxjs/operators';
 
@@ -29,9 +29,40 @@ export class ArenaComponent implements OnInit {
       .subscribe(_ => {
         // console.log(this.fsm.State);
         // console.log(this.fsm.ExtendedStates);
-        this.Komei.addAction(random(3, 5));
-        this.Xiaohua.addAction(random(3, 5));
+
+        // 應該 被歸入 競技場 狀態機
+        if (
+          this.Komei.State === RoleStatus.Idle &&
+          this.Xiaohua.State === RoleStatus.Idle
+        ) {
+          this.Komei.addAction(random(3, 5));
+          this.Xiaohua.addAction(random(3, 5));
+        }
+
       });
+
+    this.Komei.StateChange.subscribe(e => {
+      if (e.to === RoleStatus.Action) {
+        const cost = random(30, 50);
+        const damage = random(10, 20);
+        this.Komei.startAttack(cost);
+        setTimeout(() => {
+          this.Komei.endAction();
+          this.Xiaohua.getDamage(damage);
+        }, 1000);
+      }
+    });
+    this.Xiaohua.StateChange.subscribe(e => {
+      if (e.to === RoleStatus.Action) {
+        const cost = random(30, 50);
+        const damage = random(10, 20);
+        this.Xiaohua.startAttack(cost);
+        setTimeout(() => {
+          this.Xiaohua.endAction();
+          this.Komei.getDamage(damage);
+        }, 1000);
+      }
+    });
   }
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====

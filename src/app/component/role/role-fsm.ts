@@ -9,6 +9,10 @@ export enum RoleStatus {
   Skill,
   Die,
 }
+
+const AllRoleStatus = Object.keys(RoleStatus)
+  .map(key => RoleStatus[key])
+  .filter(value => !isNaN(Number(value)));
 export class RoleFSM extends BasicFSMObject {
 
   static EventDictionary = {}; // 必須有 不然會共用 super
@@ -44,37 +48,41 @@ export class RoleFSM extends BasicFSMObject {
   ) {
     super();
     this.Name = name;
+    // console.log(AllRoleStatus);
+    // console.log(RoleFSM.GuardDictionary);
   }
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // Events
   @Event(RoleStatus.Idle)
   addAction(point: number) {
-    this.ActionPoint += point;
+    this.ActionPoint = Math.min(this.ActionPoint + point, 100);
     return true;
   }
 
   @Event(RoleStatus.Action)
-  startAttack() {
-    console.log('startAttack');
-    return true;
-  }
-
-  @Event(RoleStatus.Attack)
-  endAttack() {
-    console.log('endAttack');
+  startAttack(cost: number) {
+    this.ActionPoint -= cost;
+    this.State = RoleStatus.Attack;
     return true;
   }
 
   @Event(RoleStatus.Action)
-  startSkill() {
-    console.log('startSkill');
+  startSkill(cost: number) {
+    this.ActionPoint -= cost;
+    this.State = RoleStatus.Skill;
     return true;
   }
 
-  @Event(RoleStatus.Skill)
-  endSkill() {
-    console.log('endSkill');
+  @Event([RoleStatus.Attack, RoleStatus.Skill])
+  endAction() {
+    this.State = RoleStatus.Idle;
+    return true;
+  }
+
+  @Event(AllRoleStatus)
+  getDamage(point: number) {
+    this.HealthPoint = Math.max(this.HealthPoint - point, 0);
     return true;
   }
 

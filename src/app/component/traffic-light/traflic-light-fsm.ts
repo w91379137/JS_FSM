@@ -8,6 +8,10 @@ export enum LightStatus {
   Red,
 }
 
+const AllLightStatus = Object.keys(LightStatus)
+  .map(key => LightStatus[key])
+  .filter(value => !isNaN(Number(value)));
+
 const GreenTime = 10;
 const YellowTime = 10;
 const RedTime = 10;
@@ -63,7 +67,7 @@ export class TraflicLightFSM extends BasicFSMObject {
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // Events
-  @Event([LightStatus.Green, LightStatus.Yellow, LightStatus.Red])
+  @Event(AllLightStatus)
   increaseTime(): boolean {
     switch (this.State) {
       case LightStatus.Green:
