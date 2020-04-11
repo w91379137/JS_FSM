@@ -1,5 +1,5 @@
 import { BasicFSMObject } from '../../share/basic-fsm-object';
-import { Event, Guard, State } from 'src/app/share/basic-fsm-decorator';
+import { State, Event, Guard } from 'src/app/share/basic-fsm-decorator';
 import { Subject } from 'rxjs';
 
 export enum LightStatus {
@@ -32,7 +32,7 @@ export class TraflicLightFSM extends BasicFSMObject {
   InRedTime = 0; // 在 紅燈秒數
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
-  // Life
+  // Life Cycle
   constructor() {
     super();
     // console.log('EventDictionary', TraflicLightFSM.EventDictionary);
