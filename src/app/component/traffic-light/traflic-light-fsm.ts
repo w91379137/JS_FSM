@@ -16,9 +16,9 @@ export class TraflicLightFSM extends BasicFSMObject {
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // State
-  static AllState = Object.keys(LightStatus)
-    .map(key => LightStatus[key])
-    .filter(value => !isNaN(Number(value))); // 取出所有狀態
+  // static AllState = Object.keys(LightStatus)
+  //   .map(key => LightStatus[key])
+  //   .filter(value => !isNaN(Number(value))); // 取出所有狀態
 
   @State()
   State = LightStatus.Green;

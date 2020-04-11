@@ -9,7 +9,7 @@ import { Subject } from 'rxjs';
 export class BasicFSMObject {
 
   // State(只能透過 Events 更改)
-  static AllState: any[] = []; // 給子類自己選擇要哪個 enum
+  // static AllState: any[] = []; // 給子類自己選擇要哪個 enum
   static EventDictionary = {};
   static GuardDictionary = {};
 
