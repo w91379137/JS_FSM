@@ -71,8 +71,14 @@ export class ArenaFSM extends BasicFSMObject {
         break;
 
       case ArenaStatus.Work:
+
+        const workTeam = this.allTeam.find(team => team.State === RoleTeamStatus.Work);
+        if (workTeam) {
+          return false;
+        }
+
         for (const roleTeam of this.allTeam) {
-          if (roleTeam.State === RoleTeamStatus.Work) {
+          if (roleTeam.State === RoleTeamStatus.Ready) {
 
             // 攻擊方
             const AttackRole = roleTeam.getReadyRole();
@@ -104,7 +110,8 @@ export class ArenaFSM extends BasicFSMObject {
               if (UnderAttackRole.HealthPoint <= 0) {
                 this.addEventLog(`${UnderAttackRole.Name} 屎掉了`);
               }
-            }, 1000);
+            }, 700);
+            break;
           }
         }
         break;
@@ -116,9 +123,12 @@ export class ArenaFSM extends BasicFSMObject {
   // Guard conditions
 
   @Guard(ArenaStatus.Idle, ArenaStatus.Work)
-  isAnyoneReady(): boolean {
+  isAnyTeamWork(): boolean {
     for (const roleTeam of this.allTeam) {
-      if (roleTeam.State === RoleTeamStatus.Work) {
+      if (
+        roleTeam.State === RoleTeamStatus.Ready ||
+        roleTeam.State === RoleTeamStatus.Work
+      ) {
         return true;
       }
     }
@@ -126,7 +136,7 @@ export class ArenaFSM extends BasicFSMObject {
   }
 
   @Guard(ArenaStatus.Work, ArenaStatus.Idle)
-  isAllIdle(): boolean {
+  isAllTeamIdle(): boolean {
     for (const roleTeam of this.allTeam) {
       if (roleTeam.State !== RoleTeamStatus.Idle) {
         return false;
@@ -136,7 +146,7 @@ export class ArenaFSM extends BasicFSMObject {
   }
 
   @Guard([ArenaStatus.Idle, ArenaStatus.Work], ArenaStatus.End)
-  isAnyoneDie(): boolean {
+  isAnyTeamEnd(): boolean {
     for (const roleTeam of this.allTeam) {
       if (roleTeam.State === RoleTeamStatus.End) {
         this.addEventLog(`${roleTeam.Name} 全滅了`);

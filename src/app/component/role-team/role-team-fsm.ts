@@ -5,6 +5,7 @@ import { RoleFSM, RoleStatus } from '../role/role-fsm';
 
 export enum RoleTeamStatus {
   Idle = 0,
+  Ready,
   Work,
   End,
 }
@@ -59,13 +60,20 @@ export class RoleTeamFSM extends BasicFSMObject {
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // Guard conditions
 
-  @Guard(RoleTeamStatus.Idle, RoleTeamStatus.Work)
+  @Guard(RoleTeamStatus.Idle, RoleTeamStatus.Ready)
   isAnyoneReady(): boolean {
     for (const role of this.teamMenber) {
-      if (
-        role.State === RoleStatus.Ready ||
-        role.State === RoleStatus.Work
-      ) {
+      if (role.State === RoleStatus.Ready) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Guard(RoleTeamStatus.Ready, RoleTeamStatus.Work)
+  isAnyoneWork(): boolean {
+    for (const role of this.teamMenber) {
+      if (role.State === RoleStatus.Work) {
         return true;
       }
     }
@@ -73,16 +81,8 @@ export class RoleTeamFSM extends BasicFSMObject {
   }
 
   @Guard(RoleTeamStatus.Work, RoleTeamStatus.Idle)
-  isAllInIdle(): boolean {
-    for (const role of this.teamMenber) {
-      if (
-        role.State !== RoleStatus.Idle &&
-        role.State !== RoleStatus.Die
-      ) {
-        return false;
-      }
-    }
-    return true;
+  isFinishWork(): boolean {
+    return !this.teamMenber.find(role => role.State === RoleStatus.Work);
   }
 
   @Guard(RoleTeamStatus.Idle, RoleTeamStatus.End)
