@@ -3,6 +3,7 @@ import { BasicFSMObject } from 'src/app/share/basic-fsm-object';
 import { State, Event, Guard } from 'src/app/share/basic-fsm-decorator';
 import { Subject } from 'rxjs';
 import { RoleFSM, RoleStatus } from 'src/app/component/role/role-fsm';
+import * as moment from 'moment';
 
 export enum ArenaStatus {
   Idle = 0,
@@ -40,6 +41,8 @@ export class ArenaFSM extends BasicFSMObject {
   get allRole() {
     return this.teamA.concat(this.teamB);
   }
+
+  eventLog: string[] = [];
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // Life Cycle
@@ -82,9 +85,11 @@ export class ArenaFSM extends BasicFSMObject {
             const damage = random(10, 20);
 
             role.startWork(cost);
+            this.addEventLog(`${role.Name} 準備攻擊`);
             setTimeout(() => {
               UnderAttackRole.getDamage(damage);
               role.endWork();
+              this.addEventLog(`${role.Name} 攻擊 ${UnderAttackRole.Name} 造成 ${damage} 傷害`);
             }, 1000);
           }
         }
@@ -115,6 +120,30 @@ export class ArenaFSM extends BasicFSMObject {
     }
     return true;
   }
+
+  @Guard([ArenaStatus.Idle, ArenaStatus.Work], ArenaStatus.End)
+  isAnyoneDie(): boolean {
+    for (const role of this.allRole) {
+      if (role.State === RoleStatus.Die) {
+        this.addEventLog(`${role.Name} 屎掉了`);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
+  // 其他
+  addEventLog(msg: string) {
+    if (this.eventLog.length > 10) {
+      this.eventLog.shift();
+    }
+    this.eventLog.push(`${current()} > ${msg}`);
+  }
+}
+
+function current(date: Date = new Date()): string {
+  return moment(date).local().format('HH:mm:ss');
 }
 
 function random(min, max) {
