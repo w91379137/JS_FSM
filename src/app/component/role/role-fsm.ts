@@ -86,7 +86,7 @@ export class RoleFSM extends BasicFSMObject {
     return this.ActionPoint >= 100;
   }
 
-  @Guard(RoleStatus.Idle, RoleStatus.Die)
+  @Guard([RoleStatus.Idle, RoleStatus.Ready, RoleStatus.Work], RoleStatus.Die)
   isDie(): boolean {
     return this.HealthPoint <= 0;
   }
