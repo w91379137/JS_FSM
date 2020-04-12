@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
+import { RoleTeamFSM, RoleTeamStatus } from './role-team-fsm';
 
 @Component({
   selector: 'app-role-team',
@@ -7,9 +8,17 @@ import { Component, OnInit } from '@angular/core';
 })
 export class RoleTeamComponent implements OnInit {
 
+  RTStatus = RoleTeamStatus;
+
+  @Input()
+  roleTeam: RoleTeamFSM;
+
+  // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
+
   constructor() { }
 
   ngOnInit() {
+
   }
 
 }
