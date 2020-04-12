@@ -47,7 +47,7 @@ export class RoleFSM extends BasicFSMObject {
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // Life Cycle
   constructor(
-    name: string,
+    name: string = '',
   ) {
     super();
     this.Name = name;
