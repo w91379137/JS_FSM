@@ -70,12 +70,17 @@ export class RoleTeamFSM extends BasicFSMObject {
     return !!this.teamMenber.find(role => role.State === RoleStatus.Work);
   }
 
+  @Guard(RoleTeamStatus.Ready, RoleTeamStatus.Idle)
+  isNobodyReady(): boolean {
+    return !this.teamMenber.find(role => role.State === RoleStatus.Ready);
+  }
+
   @Guard(RoleTeamStatus.Work, RoleTeamStatus.Idle)
   isNobodyWork(): boolean {
     return !this.teamMenber.find(role => role.State === RoleStatus.Work);
   }
 
-  @Guard(RoleTeamStatus.Idle, RoleTeamStatus.End)
+  @Guard([RoleTeamStatus.Idle, RoleTeamStatus.Ready, RoleTeamStatus.Work], RoleTeamStatus.End)
   isAllDie(): boolean {
     return !this.teamMenber.find(role => role.State !== RoleStatus.Die);
   }
