@@ -17,8 +17,9 @@ export class ArenaComponent implements OnInit {
 
   constructor() {
     this.Arena = new ArenaFSM('競技場');
-    this.Arena.teamA.push(new RoleFSM('小明'));
-    this.Arena.teamB.push(new RoleFSM('小華'));
+    const idxArr = Array(3).fill(1).map((_, i) => i + 1);
+    this.Arena.teamA = idxArr.map(idx => new RoleFSM(`小明${idx}`));
+    this.Arena.teamB = idxArr.map(idx => new RoleFSM(`小華${idx}`));
   }
 
   ngOnInit() {
@@ -27,7 +28,7 @@ export class ArenaComponent implements OnInit {
       .subscribe(_ => {
         // console.log(this.fsm.State);
         // console.log(this.fsm.ExtendedStates);
-        this.Arena.check();
+        // this.Arena.check();
       });
   }
 

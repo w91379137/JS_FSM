@@ -1,12 +1,13 @@
-<div *ngFor="let role of Arena.teamA">
+<div *ngFor="let role of Arena.teamA" class='role-box'>
   <app-role [role]=role></app-role>
 </div>
 
-<hr>
+<hr class='hr-line'>
 
-<div *ngFor="let role of Arena.teamB">
+<div *ngFor="let role of Arena.teamB" class='role-box'>
   <app-role [role]=role></app-role>
 </div>
 
-<hr>
+<hr class='hr-line'>
+
 <p *ngFor="let msg of Arena.eventLog.reverse()">{{msg}}</p>
