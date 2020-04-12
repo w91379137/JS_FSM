@@ -53,12 +53,40 @@ export class ArenaFSM extends BasicFSMObject {
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // Events
   @Event(AllArenaStatus)
-  check() {
+  check(): boolean {
 
     switch (this.State) {
       case ArenaStatus.Idle:
         for (const role of this.allRole) {
-          role.addAction(random(3, 5));
+          role.addAction(random(3, 10));
+        }
+        break;
+
+      case ArenaStatus.Work:
+        for (const role of this.allRole) {
+          if (role.State === RoleStatus.Ready) {
+
+            // 找到對手
+            let UnderAttackRole: RoleFSM;
+            if (this.teamA.includes(role)) {
+              UnderAttackRole = this.teamB[0];
+            } else {
+              UnderAttackRole = this.teamA[0];
+            }
+
+            if (!UnderAttackRole) {
+              return false;
+            }
+
+            const cost = random(30, 50);
+            const damage = random(10, 20);
+
+            role.startWork(cost);
+            setTimeout(() => {
+              UnderAttackRole.getDamage(damage);
+              role.endWork();
+            }, 1000);
+          }
         }
         break;
     }
@@ -69,9 +97,9 @@ export class ArenaFSM extends BasicFSMObject {
   // Guard conditions
 
   @Guard(ArenaStatus.Idle, ArenaStatus.Work)
-  isAnyoneWork(): boolean {
+  isAnyoneReady(): boolean {
     for (const role of this.allRole) {
-      if (role.State !== RoleStatus.Idle) {
+      if (role.State === RoleStatus.Ready) {
         return true;
       }
     }
