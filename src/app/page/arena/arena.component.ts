@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { RoleFSM, RoleStatus } from 'src/app/component/role/role-fsm';
 import { interval } from 'rxjs';
 import { take } from 'rxjs/operators';
+import { ArenaFSM } from './arena-fsm';
 
 @Component({
   selector: 'app-arena',
@@ -9,6 +10,9 @@ import { take } from 'rxjs/operators';
   styleUrls: ['./arena.component.scss']
 })
 export class ArenaComponent implements OnInit {
+
+  // 競技場
+  Arena: ArenaFSM;
 
   // 小明
   Komei: RoleFSM;
@@ -19,8 +23,12 @@ export class ArenaComponent implements OnInit {
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
 
   constructor() {
+    this.Arena = new ArenaFSM('Test');
     this.Komei = new RoleFSM('小明');
     this.Xiaohua = new RoleFSM('小華');
+
+    this.Arena.teamA.push(this.Komei);
+    this.Arena.teamB.push(this.Xiaohua);
   }
 
   ngOnInit() {
@@ -29,16 +37,7 @@ export class ArenaComponent implements OnInit {
       .subscribe(_ => {
         // console.log(this.fsm.State);
         // console.log(this.fsm.ExtendedStates);
-
-        // 應該 被歸入 競技場 狀態機
-        if (
-          this.Komei.State === RoleStatus.Idle &&
-          this.Xiaohua.State === RoleStatus.Idle
-        ) {
-          this.Komei.addAction(random(3, 5));
-          this.Xiaohua.addAction(random(3, 5));
-        }
-
+        this.Arena.check();
       });
 
     this.Komei.StateChange.subscribe(e => {
