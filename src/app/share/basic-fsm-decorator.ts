@@ -12,14 +12,17 @@ export function State() {
     propertyKey: string | symbol,
   ) {
 
-    let val = target[propertyKey];
-
+    const val = target[propertyKey];
     const getter = function newGetter() {
-      return val;
+      if (this.pState === undefined) {
+        this.pState = val;
+      }
+      return this.pState;
     };
     const setter = function newSetter(next) {
-      this.StateChange.next({ from: val, to: next });
-      val = next;
+      const old = this.pState;
+      this.pState = next;
+      this.StateChange.next({ from: old, to: next });
     };
 
     Object.defineProperty(target, propertyKey, {
@@ -41,6 +44,7 @@ export function Event(
   ) {
     // Write Table
     const dict = target.constructor.EventDictionary;
+    // console.log(target.constructor);
     for (const ele of oneToArr(inState)) {
       const list = dict.hasOwnProperty(ele) ? dict[ele] : [];
       list.push(propertyKey);
@@ -75,6 +79,7 @@ export function Guard(
   ) {
     // Write Table
     const dict = target.constructor.GuardDictionary;
+    // console.log(target.constructor);
     for (const ele of oneToArr(fromState)) {
       const list = dict.hasOwnProperty(ele) ? dict[ele] : [];
       list.push(propertyKey);

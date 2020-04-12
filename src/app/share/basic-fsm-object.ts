@@ -13,6 +13,7 @@ export class BasicFSMObject {
   static EventDictionary = {};
   static GuardDictionary = {};
 
+  pState: any;
   State: any; // 給子類自己選擇要哪個 enum
   StateChange = new Subject<{ from: any, to: any }>();
 
@@ -31,9 +32,20 @@ export class BasicFSMObject {
   checkAll() {
     // tslint:disable-next-line:no-string-literal
     const funcNameList = this.constructor['GuardDictionary'][this.State];
+
+    if (!funcNameList) {
+      // 不用 check 的 屬性
+      // console.log(this, this.State);
+      return;
+    }
+
     for (const funcName of funcNameList) {
       const func = this[funcName];
-      func.apply(this);
+      if (func) {
+        func.apply(this);
+      } else {
+        console.log(this, funcName);
+      }
     }
   }
 

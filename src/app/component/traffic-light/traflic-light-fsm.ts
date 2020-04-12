@@ -1,5 +1,5 @@
 import { BasicFSMObject } from '../../share/basic-fsm-object';
-import { Event, Guard, State } from 'src/app/share/basic-fsm-decorator';
+import { State, Event, Guard } from 'src/app/share/basic-fsm-decorator';
 import { Subject } from 'rxjs';
 
 export enum LightStatus {
@@ -8,11 +8,18 @@ export enum LightStatus {
   Red,
 }
 
+const AllLightStatus = Object.keys(LightStatus)
+  .map(key => LightStatus[key])
+  .filter(value => !isNaN(Number(value)));
+
 const GreenTime = 10;
 const YellowTime = 10;
 const RedTime = 10;
 
 export class TraflicLightFSM extends BasicFSMObject {
+
+  static EventDictionary = {}; // 必須有 不然會共用 super
+  static GuardDictionary = {}; // 必須有 不然會共用 super
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // State
@@ -32,7 +39,7 @@ export class TraflicLightFSM extends BasicFSMObject {
   InRedTime = 0; // 在 紅燈秒數
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
-  // Life
+  // Life Cycle
   constructor() {
     super();
     // console.log('EventDictionary', TraflicLightFSM.EventDictionary);
@@ -60,7 +67,7 @@ export class TraflicLightFSM extends BasicFSMObject {
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // Events
-  @Event([LightStatus.Green, LightStatus.Yellow, LightStatus.Red])
+  @Event(AllLightStatus)
   increaseTime(): boolean {
     switch (this.State) {
       case LightStatus.Green:
