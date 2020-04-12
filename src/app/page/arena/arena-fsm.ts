@@ -2,8 +2,9 @@
 import { BasicFSMObject } from 'src/app/share/basic-fsm-object';
 import { State, Event, Guard } from 'src/app/share/basic-fsm-decorator';
 import { Subject } from 'rxjs';
-import { RoleFSM, RoleStatus } from 'src/app/component/role/role-fsm';
+import { RoleFSM } from 'src/app/component/role/role-fsm';
 import * as moment from 'moment';
+import { RoleTeamFSM, RoleTeamStatus } from '../../component/role-team/role-team-fsm';
 
 export enum ArenaStatus {
   Idle = 0,
@@ -33,13 +34,13 @@ export class ArenaFSM extends BasicFSMObject {
   Name = '';
 
   /** A隊 */
-  teamA: RoleFSM[] = [];
+  teamA: RoleTeamFSM;
 
   /** B隊 */
-  teamB: RoleFSM[] = [];
+  teamB: RoleTeamFSM;
 
-  get allRole() {
-    return this.teamA.concat(this.teamB);
+  get allTeam() {
+    return [this.teamA, this.teamB];
   }
 
   eventLog: string[] = [];
@@ -58,23 +59,39 @@ export class ArenaFSM extends BasicFSMObject {
   @Event(AllArenaStatus)
   check(): boolean {
 
+    for (const roleTeam of this.allTeam) {
+      roleTeam.check();
+    }
+
     switch (this.State) {
       case ArenaStatus.Idle:
-        for (const role of this.allRole) {
-          role.addAction(random(3, 10));
+        for (const roleTeam of this.allTeam) {
+          roleTeam.addAction();
         }
         break;
 
       case ArenaStatus.Work:
-        for (const role of this.allRole) {
-          if (role.State === RoleStatus.Ready) {
 
-            // 找到對手
+        const workTeam = this.allTeam.find(team => team.State === RoleTeamStatus.Work);
+        if (workTeam) {
+          return false;
+        }
+
+        for (const roleTeam of this.allTeam) {
+          if (roleTeam.State === RoleTeamStatus.Ready) {
+
+            // 攻擊方
+            const AttackRole = roleTeam.getReadyRole();
+            if (!AttackRole) {
+              return false;
+            }
+
+            // 受攻擊方
             let UnderAttackRole: RoleFSM;
-            if (this.teamA.includes(role)) {
-              UnderAttackRole = this.teamB[0];
+            if (roleTeam === this.teamA) {
+              UnderAttackRole = this.teamB.getNoDieRole();
             } else {
-              UnderAttackRole = this.teamA[0];
+              UnderAttackRole = this.teamA.getNoDieRole();
             }
 
             if (!UnderAttackRole) {
@@ -84,13 +101,17 @@ export class ArenaFSM extends BasicFSMObject {
             const cost = random(30, 50);
             const damage = random(10, 20);
 
-            role.startWork(cost);
-            this.addEventLog(`${role.Name} 準備攻擊`);
+            AttackRole.startWork(cost);
+            this.addEventLog(`${AttackRole.Name} 準備攻擊`);
             setTimeout(() => {
               UnderAttackRole.getDamage(damage);
-              role.endWork();
-              this.addEventLog(`${role.Name} 攻擊 ${UnderAttackRole.Name} 造成 ${damage} 傷害`);
-            }, 1000);
+              AttackRole.endWork();
+              this.addEventLog(`${AttackRole.Name} 攻擊 ${UnderAttackRole.Name} 造成 ${damage} 傷害`);
+              if (UnderAttackRole.HealthPoint <= 0) {
+                this.addEventLog(`${UnderAttackRole.Name} 屎掉了`);
+              }
+            }, 700);
+            break;
           }
         }
         break;
@@ -102,9 +123,12 @@ export class ArenaFSM extends BasicFSMObject {
   // Guard conditions
 
   @Guard(ArenaStatus.Idle, ArenaStatus.Work)
-  isAnyoneReady(): boolean {
-    for (const role of this.allRole) {
-      if (role.State === RoleStatus.Ready) {
+  isAnyTeamWork(): boolean {
+    for (const roleTeam of this.allTeam) {
+      if (
+        roleTeam.State === RoleTeamStatus.Ready ||
+        roleTeam.State === RoleTeamStatus.Work
+      ) {
         return true;
       }
     }
@@ -112,9 +136,9 @@ export class ArenaFSM extends BasicFSMObject {
   }
 
   @Guard(ArenaStatus.Work, ArenaStatus.Idle)
-  isAllIdle(): boolean {
-    for (const role of this.allRole) {
-      if (role.State !== RoleStatus.Idle) {
+  isAllTeamIdle(): boolean {
+    for (const roleTeam of this.allTeam) {
+      if (roleTeam.State !== RoleTeamStatus.Idle) {
         return false;
       }
     }
@@ -122,10 +146,10 @@ export class ArenaFSM extends BasicFSMObject {
   }
 
   @Guard([ArenaStatus.Idle, ArenaStatus.Work], ArenaStatus.End)
-  isAnyoneDie(): boolean {
-    for (const role of this.allRole) {
-      if (role.State === RoleStatus.Die) {
-        this.addEventLog(`${role.Name} 屎掉了`);
+  isAnyTeamEnd(): boolean {
+    for (const roleTeam of this.allTeam) {
+      if (roleTeam.State === RoleTeamStatus.End) {
+        this.addEventLog(`${roleTeam.Name} 全滅了`);
         return true;
       }
     }

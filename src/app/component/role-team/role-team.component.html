@@ -1,0 +1,4 @@
+<p>{{roleTeam.Name}} 隊伍狀態 {{RTStatus[roleTeam.State]}}</p>
+<div *ngFor="let role of roleTeam.teamMenber" class='role-box'>
+  <app-role [role]=role></app-role>
+</div>

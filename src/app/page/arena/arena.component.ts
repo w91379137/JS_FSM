@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { RoleFSM, RoleStatus } from 'src/app/component/role/role-fsm';
+import { RoleFSM } from 'src/app/component/role/role-fsm';
 import { interval } from 'rxjs';
-import { ArenaFSM } from './arena-fsm';
+import { ArenaFSM, ArenaStatus } from './arena-fsm';
+import { RoleTeamFSM } from '../../component/role-team/role-team-fsm';
 
 @Component({
   selector: 'app-arena',
@@ -10,6 +11,7 @@ import { ArenaFSM } from './arena-fsm';
 })
 export class ArenaComponent implements OnInit {
 
+  AStatus = ArenaStatus;
   // 競技場
   Arena: ArenaFSM;
 
@@ -17,8 +19,15 @@ export class ArenaComponent implements OnInit {
 
   constructor() {
     this.Arena = new ArenaFSM('競技場');
-    this.Arena.teamA.push(new RoleFSM('小明'));
-    this.Arena.teamB.push(new RoleFSM('小華'));
+    const idxArr = Array(3).fill(1).map((_, i) => i + 1);
+
+    const teamA = new RoleTeamFSM('A');
+    teamA.teamMenber = idxArr.map(idx => new RoleFSM(`小明${idx}`));
+    this.Arena.teamA = teamA;
+
+    const teamB = new RoleTeamFSM('B');
+    teamB.teamMenber = idxArr.map(idx => new RoleFSM(`小華${idx}`));
+    this.Arena.teamB = teamB;
   }
 
   ngOnInit() {
