@@ -3,6 +3,7 @@ import { BasicFSMObject } from 'src/app/share/basic-fsm-object';
 import { State, Event, Guard } from 'src/app/share/basic-fsm-decorator';
 import { Subject } from 'rxjs';
 import { RoleFSM, RoleStatus } from 'src/app/component/role/role-fsm';
+import * as moment from 'moment';
 
 export enum ArenaStatus {
   Idle = 0,
@@ -137,8 +138,12 @@ export class ArenaFSM extends BasicFSMObject {
     if (this.eventLog.length > 10) {
       this.eventLog.shift();
     }
-    this.eventLog.push(`${new Date()}> ${msg}`);
+    this.eventLog.push(`${current()} > ${msg}`);
   }
+}
+
+function current(date: Date = new Date()): string {
+  return moment(date).local().format('HH:mm:ss');
 }
 
 function random(min, max) {
