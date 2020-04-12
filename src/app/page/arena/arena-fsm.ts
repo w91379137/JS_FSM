@@ -120,6 +120,17 @@ export class ArenaFSM extends BasicFSMObject {
     return true;
   }
 
+  @Guard([ArenaStatus.Idle, ArenaStatus.Work], ArenaStatus.End)
+  isAnyoneDie(): boolean {
+    for (const role of this.allRole) {
+      if (role.State === RoleStatus.Die) {
+        this.addEventLog(`${role.Name} 屎掉了`);
+        return true;
+      }
+    }
+    return false;
+  }
+
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // 其他
   addEventLog(msg: string) {
