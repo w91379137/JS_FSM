@@ -41,6 +41,8 @@ export class ArenaFSM extends BasicFSMObject {
     return this.teamA.concat(this.teamB);
   }
 
+  eventLog: string[] = [];
+
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // Life Cycle
   constructor(
@@ -82,9 +84,11 @@ export class ArenaFSM extends BasicFSMObject {
             const damage = random(10, 20);
 
             role.startWork(cost);
+            this.addEventLog(`${role.Name} 準備攻擊`);
             setTimeout(() => {
               UnderAttackRole.getDamage(damage);
               role.endWork();
+              this.addEventLog(`${role.Name} 攻擊 ${UnderAttackRole.Name} 造成 ${damage} 傷害`);
             }, 1000);
           }
         }
@@ -114,6 +118,15 @@ export class ArenaFSM extends BasicFSMObject {
       }
     }
     return true;
+  }
+
+  // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
+  // 其他
+  addEventLog(msg: string) {
+    if (this.eventLog.length > 10) {
+      this.eventLog.shift();
+    }
+    this.eventLog.push(`${new Date()}> ${msg}`);
   }
 }
 

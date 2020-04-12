@@ -7,3 +7,6 @@
 <div *ngFor="let role of Arena.teamB">
   <app-role [role]=role></app-role>
 </div>
+
+<hr>
+<p *ngFor="let msg of Arena.eventLog.reverse()">{{msg}}</p>
