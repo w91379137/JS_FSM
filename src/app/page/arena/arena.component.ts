@@ -42,24 +42,24 @@ export class ArenaComponent implements OnInit {
       });
 
     this.Komei.StateChange.subscribe(e => {
-      if (e.to === RoleStatus.Action) {
+      if (e.to === RoleStatus.Ready) {
         const cost = random(30, 50);
         const damage = random(10, 20);
-        this.Komei.startAttack(cost);
+        this.Komei.startWork(cost);
         setTimeout(() => {
-          this.Komei.endAction();
           this.Xiaohua.getDamage(damage);
+          this.Komei.endWork();
         }, 1000);
       }
     });
     this.Xiaohua.StateChange.subscribe(e => {
-      if (e.to === RoleStatus.Action) {
+      if (e.to === RoleStatus.Ready) {
         const cost = random(30, 50);
         const damage = random(10, 20);
-        this.Xiaohua.startAttack(cost);
+        this.Xiaohua.startWork(cost);
         setTimeout(() => {
-          this.Xiaohua.endAction();
           this.Komei.getDamage(damage);
+          this.Xiaohua.endWork();
         }, 1000);
       }
     });

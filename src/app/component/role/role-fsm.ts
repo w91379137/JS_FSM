@@ -4,9 +4,8 @@ import { Subject } from 'rxjs';
 
 export enum RoleStatus {
   Idle = 0,
-  Action,
-  Attack,
-  Skill,
+  Ready,
+  Work,
   Die,
 }
 
@@ -60,22 +59,15 @@ export class RoleFSM extends BasicFSMObject {
     return true;
   }
 
-  @Event(RoleStatus.Action)
-  startAttack(cost: number) {
+  @Event(RoleStatus.Ready)
+  startWork(cost: number) {
     this.ActionPoint -= cost;
-    this.State = RoleStatus.Attack;
+    this.State = RoleStatus.Work;
     return true;
   }
 
-  @Event(RoleStatus.Action)
-  startSkill(cost: number) {
-    this.ActionPoint -= cost;
-    this.State = RoleStatus.Skill;
-    return true;
-  }
-
-  @Event([RoleStatus.Attack, RoleStatus.Skill])
-  endAction() {
+  @Event(RoleStatus.Work)
+  endWork() {
     this.State = RoleStatus.Idle;
     return true;
   }
@@ -89,7 +81,7 @@ export class RoleFSM extends BasicFSMObject {
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // Guard conditions
 
-  @Guard(RoleStatus.Idle, RoleStatus.Action)
+  @Guard(RoleStatus.Idle, RoleStatus.Ready)
   isActionPointFull(): boolean {
     return this.ActionPoint >= 100;
   }
