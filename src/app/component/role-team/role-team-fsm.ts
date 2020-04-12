@@ -62,50 +62,34 @@ export class RoleTeamFSM extends BasicFSMObject {
 
   @Guard(RoleTeamStatus.Idle, RoleTeamStatus.Ready)
   isAnyoneReady(): boolean {
-    for (const role of this.teamMenber) {
-      if (role.State === RoleStatus.Ready) {
-        return true;
-      }
-    }
-    return false;
+    return !!this.teamMenber.find(role => role.State === RoleStatus.Ready);
   }
 
   @Guard(RoleTeamStatus.Ready, RoleTeamStatus.Work)
   isAnyoneWork(): boolean {
-    for (const role of this.teamMenber) {
-      if (role.State === RoleStatus.Work) {
-        return true;
-      }
-    }
-    return false;
+    return !!this.teamMenber.find(role => role.State === RoleStatus.Work);
   }
 
   @Guard(RoleTeamStatus.Work, RoleTeamStatus.Idle)
-  isFinishWork(): boolean {
+  isNobodyWork(): boolean {
     return !this.teamMenber.find(role => role.State === RoleStatus.Work);
   }
 
   @Guard(RoleTeamStatus.Idle, RoleTeamStatus.End)
   isAllDie(): boolean {
-    for (const role of this.teamMenber) {
-      if (
-        role.State !== RoleStatus.Die
-      ) {
-        return false;
-      }
-    }
-    return true;
+    return !this.teamMenber.find(role => role.State !== RoleStatus.Die);
   }
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // 其他
   getReadyRole() {
-    return this.teamMenber.find(role => role.State === RoleStatus.Ready);
+    const roles = this.teamMenber.filter(role => role.State === RoleStatus.Ready);
+    return roles[random(0, roles.length)];
   }
 
-  getAliveRole() {
-    const aliveRole = this.teamMenber.filter(role => role.HealthPoint > 0);
-    return aliveRole[random(0, aliveRole.length)];
+  getNoDieRole() {
+    const roles = this.teamMenber.filter(role => role.State !== RoleStatus.Die);
+    return roles[random(0, roles.length)];
   }
 }
 

@@ -89,9 +89,9 @@ export class ArenaFSM extends BasicFSMObject {
             // 受攻擊方
             let UnderAttackRole: RoleFSM;
             if (roleTeam === this.teamA) {
-              UnderAttackRole = this.teamB.getAliveRole();
+              UnderAttackRole = this.teamB.getNoDieRole();
             } else {
-              UnderAttackRole = this.teamA.getAliveRole();
+              UnderAttackRole = this.teamA.getNoDieRole();
             }
 
             if (!UnderAttackRole) {
