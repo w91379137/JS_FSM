@@ -3,20 +3,9 @@ import { RoleFSM, RoleStatus } from './role-fsm';
 import { prettyPrintObj } from 'src/app/share/share-functions';
 // ng test --main ./src/app/component/role/role-fsm.spec.ts
 
-function getIdleRole() {
+function getRole(state: RoleStatus) {
   const fsm = new RoleFSM();
-  return fsm;
-}
-
-function getReadyRole() {
-  const fsm = getIdleRole();
-  fsm.addAction(100);
-  return fsm;
-}
-
-function getWorkRole() {
-  const fsm = getReadyRole();
-  fsm.startWork(100);
+  fsm.State = state;
   return fsm;
 }
 
@@ -31,8 +20,7 @@ describe(RoleFSM.name, () => {
   });
 
   it('isActionPointFull', async (done) => {
-    const fsm = getIdleRole();
-    expect(fsm.State).toBe(RoleStatus.Idle);
+    const fsm = getRole(RoleStatus.Idle);
 
     const isDo = fsm.addAction(100);
 
@@ -42,8 +30,7 @@ describe(RoleFSM.name, () => {
   });
 
   it('isStartWork', async (done) => {
-    const fsm = getReadyRole();
-    expect(fsm.State).toBe(RoleStatus.Ready);
+    const fsm = getRole(RoleStatus.Ready);
 
     const isDo = fsm.startWork(100);
 
@@ -53,8 +40,7 @@ describe(RoleFSM.name, () => {
   });
 
   it('isEndWork', async (done) => {
-    const fsm = getWorkRole();
-    expect(fsm.State).toBe(RoleStatus.Work);
+    const fsm = getRole(RoleStatus.Work);
 
     const isDo = fsm.endWork();
 
@@ -65,8 +51,7 @@ describe(RoleFSM.name, () => {
 
   it('isDie', async (done) => {
     {
-      const fsm = getIdleRole();
-      expect(fsm.State).toBe(RoleStatus.Idle);
+      const fsm = getRole(RoleStatus.Idle);
 
       const isDo = fsm.getDamage(100);
 
@@ -75,8 +60,7 @@ describe(RoleFSM.name, () => {
     }
 
     {
-      const fsm = getReadyRole();
-      expect(fsm.State).toBe(RoleStatus.Ready);
+      const fsm = getRole(RoleStatus.Ready);
 
       const isDo = fsm.getDamage(100);
 
@@ -85,8 +69,7 @@ describe(RoleFSM.name, () => {
     }
 
     {
-      const fsm = getWorkRole();
-      expect(fsm.State).toBe(RoleStatus.Work);
+      const fsm = getRole(RoleStatus.Work);
 
       const isDo = fsm.getDamage(100);
 
@@ -96,8 +79,4 @@ describe(RoleFSM.name, () => {
 
     done();
   });
-
-
-
-
 });
