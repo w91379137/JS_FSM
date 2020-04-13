@@ -23,7 +23,7 @@ describe(RoleTeamFSM.name, () => {
   it('isAnyoneReady', async (done) => {
     const fsm = getRoleTeam(RoleTeamStatus.Idle);
 
-    fsm.teamMenber[0].State = RoleStatus.Ready;
+    spyOnProperty(fsm.teamMenber[0], 'State', 'get').and.returnValue(RoleStatus.Ready);
     const isDo = fsm.check();
 
     expect(isDo).toBe(true);
@@ -34,7 +34,7 @@ describe(RoleTeamFSM.name, () => {
   it('isAnyoneWork', async (done) => {
     const fsm = getRoleTeam(RoleTeamStatus.Ready);
 
-    fsm.teamMenber[0].State = RoleStatus.Work;
+    spyOnProperty(fsm.teamMenber[0], 'State', 'get').and.returnValue(RoleStatus.Work);
     const isDo = fsm.check();
 
     expect(isDo).toBe(true);
@@ -66,7 +66,10 @@ describe(RoleTeamFSM.name, () => {
     {
       const fsm = getRoleTeam(RoleTeamStatus.Idle);
 
-      fsm.teamMenber.forEach(role => role.State = RoleStatus.Die);
+      fsm.teamMenber.forEach(role => {
+        spyOnProperty(role, 'State', 'get').and.returnValue(RoleStatus.Die);
+      });
+
       const isDo = fsm.check();
 
       expect(isDo).toBe(true);
@@ -76,7 +79,9 @@ describe(RoleTeamFSM.name, () => {
     {
       const fsm = getRoleTeam(RoleTeamStatus.Ready);
 
-      fsm.teamMenber.forEach(role => role.State = RoleStatus.Die);
+      fsm.teamMenber.forEach(role => {
+        spyOnProperty(role, 'State', 'get').and.returnValue(RoleStatus.Die);
+      });
       const isDo = fsm.check();
 
       expect(isDo).toBe(true);
@@ -86,7 +91,9 @@ describe(RoleTeamFSM.name, () => {
     {
       const fsm = getRoleTeam(RoleTeamStatus.Work);
 
-      fsm.teamMenber.forEach(role => role.State = RoleStatus.Die);
+      fsm.teamMenber.forEach(role => {
+        spyOnProperty(role, 'State', 'get').and.returnValue(RoleStatus.Die);
+      });
       const isDo = fsm.check();
 
       expect(isDo).toBe(true);
