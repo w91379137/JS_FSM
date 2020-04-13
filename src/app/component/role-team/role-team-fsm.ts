@@ -47,7 +47,7 @@ export class RoleTeamFSM extends BasicFSMObject {
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // Events
   @Event(AllRoleTeamStatus)
-  check(): boolean {
+  update(): boolean {
     return true;
   }
 

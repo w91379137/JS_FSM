@@ -24,7 +24,7 @@ describe(RoleTeamFSM.name, () => {
     const fsm = getRoleTeam(RoleTeamStatus.Idle);
 
     spyOnProperty(fsm.teamMenber[0], 'State', 'get').and.returnValue(RoleStatus.Ready);
-    const isDo = fsm.check();
+    const isDo = fsm.update();
 
     expect(isDo).toBe(true);
     expect(fsm.State).toBe(RoleTeamStatus.Ready);
@@ -35,7 +35,7 @@ describe(RoleTeamFSM.name, () => {
     const fsm = getRoleTeam(RoleTeamStatus.Ready);
 
     spyOnProperty(fsm.teamMenber[0], 'State', 'get').and.returnValue(RoleStatus.Work);
-    const isDo = fsm.check();
+    const isDo = fsm.update();
 
     expect(isDo).toBe(true);
     expect(fsm.State).toBe(RoleTeamStatus.Work);
@@ -45,7 +45,7 @@ describe(RoleTeamFSM.name, () => {
   it('isNobodyReady', async (done) => {
     const fsm = getRoleTeam(RoleTeamStatus.Ready);
 
-    const isDo = fsm.check();
+    const isDo = fsm.update();
 
     expect(isDo).toBe(true);
     expect(fsm.State).toBe(RoleTeamStatus.Idle);
@@ -55,7 +55,7 @@ describe(RoleTeamFSM.name, () => {
   it('isNobodyWork', async (done) => {
     const fsm = getRoleTeam(RoleTeamStatus.Work);
 
-    const isDo = fsm.check();
+    const isDo = fsm.update();
 
     expect(isDo).toBe(true);
     expect(fsm.State).toBe(RoleTeamStatus.Idle);
@@ -70,7 +70,7 @@ describe(RoleTeamFSM.name, () => {
         spyOnProperty(role, 'State', 'get').and.returnValue(RoleStatus.Die);
       });
 
-      const isDo = fsm.check();
+      const isDo = fsm.update();
 
       expect(isDo).toBe(true);
       expect(fsm.State).toBe(RoleTeamStatus.End);
@@ -82,7 +82,7 @@ describe(RoleTeamFSM.name, () => {
       fsm.teamMenber.forEach(role => {
         spyOnProperty(role, 'State', 'get').and.returnValue(RoleStatus.Die);
       });
-      const isDo = fsm.check();
+      const isDo = fsm.update();
 
       expect(isDo).toBe(true);
       expect(fsm.State).toBe(RoleTeamStatus.End);
@@ -94,7 +94,7 @@ describe(RoleTeamFSM.name, () => {
       fsm.teamMenber.forEach(role => {
         spyOnProperty(role, 'State', 'get').and.returnValue(RoleStatus.Die);
       });
-      const isDo = fsm.check();
+      const isDo = fsm.update();
 
       expect(isDo).toBe(true);
       expect(fsm.State).toBe(RoleTeamStatus.End);

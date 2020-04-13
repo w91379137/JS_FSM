@@ -36,7 +36,7 @@ export class ArenaComponent implements OnInit {
       .subscribe(_ => {
         // console.log(this.fsm.State);
         // console.log(this.fsm.ExtendedStates);
-        this.Arena.check();
+        this.Arena.update();
       });
   }
 

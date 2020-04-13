@@ -58,10 +58,10 @@ export class ArenaFSM extends BasicFSMObject {
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // Events
   @Event(AllArenaStatus)
-  check(): boolean {
+  update(): boolean {
 
     for (const roleTeam of this.allTeam) {
-      roleTeam.check();
+      roleTeam.update();
     }
 
     switch (this.State) {
