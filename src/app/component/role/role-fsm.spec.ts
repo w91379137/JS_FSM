@@ -1,6 +1,6 @@
 
 import { RoleFSM, RoleStatus } from './role-fsm';
-import { prettyPrintObj } from 'src/app/share/share-functions';
+import { prettyPrintFSM } from 'src/app/share/fsm-decorator-print';
 // ng test --main ./src/app/component/role/role-fsm.spec.ts
 
 function getRole(state: RoleStatus) {
@@ -9,13 +9,9 @@ function getRole(state: RoleStatus) {
   return fsm;
 }
 
-describe(RoleFSM.name, () => {
+prettyPrintFSM(RoleFSM);
 
-  beforeAll(() => {
-    // const testClass = RoleFSM;
-    // console.log(testClass.name);
-    // console.log(`FSMDict:${prettyPrintObj(testClass.FSMDict)}`);
-  });
+describe(RoleFSM.name, () => {
 
   it('isActionPointFull', async (done) => {
     const fsm = getRole(RoleStatus.Idle);

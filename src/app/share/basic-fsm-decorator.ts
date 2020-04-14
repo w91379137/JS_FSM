@@ -9,9 +9,11 @@ function oneToArr(obj: any) {
 function classCheck(aClass: any) {
   // 目前就依照 不同 Decorator 依照陣列 擺放
   aClass.FSMDict = aClass.FSMDict || {
+    MainState: '',
     EventDict: {},
     GuardDict: {},
   };
+  return aClass;
 }
 
 function checkGuards() {
@@ -30,6 +32,7 @@ function checkGuards() {
 
 function instanceCheck(aInstance: any) {
   aInstance.checkGuards = aInstance.checkGuards || checkGuards;
+  return aInstance;
 }
 
 // https://www.typescriptlang.org/docs/handbook/decorators.html
@@ -48,26 +51,7 @@ export function State() {
     target: any,
     propertyKey: string | symbol,
   ) {
-
-    const val = target[propertyKey];
-    const getter = function newGetter() {
-      if (this.privateState === undefined) {
-        this.privateState = val;
-      }
-      return this.privateState;
-    };
-    const setter = function newSetter(next) {
-      const old = this.privateState;
-      this.privateState = next;
-      this.StateChange.next({ from: old, to: next });
-    };
-
-    Object.defineProperty(target, propertyKey, {
-      get: getter,
-      set: setter,
-      enumerable: true,
-      configurable: true,
-    });
+    classCheck(target.constructor).FSMDict.MainState = propertyKey;
   };
 }
 
@@ -83,8 +67,7 @@ export function Event(
     descriptor: PropertyDescriptor,
   ) {
     // Write Table
-    const selfClass = target.constructor;
-    classCheck(selfClass);
+    const selfClass = classCheck(target.constructor);
     const dict = selfClass.FSMDict.EventDict;
     // console.log(target.constructor);
     for (const ele of oneToArr(inState)) {
@@ -97,7 +80,7 @@ export function Event(
     const originalMethod = descriptor.value;
     descriptor.value = function newMethod() {
       instanceCheck(this);
-      if (!oneToArr(inState).includes(this.State)) {
+      if (!oneToArr(inState).includes(this[selfClass.FSMDict.MainState])) {
         return false;
       }
 
@@ -121,8 +104,7 @@ export function Guard(
     descriptor: PropertyDescriptor,
   ) {
     // Write Table
-    const selfClass = target.constructor;
-    classCheck(selfClass);
+    const selfClass = classCheck(target.constructor);
     const dict = selfClass.FSMDict.GuardDict;
     // console.log(target.constructor);
     for (const ele of oneToArr(fromState)) {
@@ -137,12 +119,12 @@ export function Guard(
     // Replace
     const originalMethod = descriptor.value;
     descriptor.value = function newMethod() {
-      if (!oneToArr(fromState).includes(this.State)) {
+      if (!oneToArr(fromState).includes(this[selfClass.FSMDict.MainState])) {
         return false;
       }
       const result = originalMethod.apply(this, arguments);
       if (result) {
-        this.State = toState;
+        this[selfClass.FSMDict.MainState] = toState;
       }
       return result;
     };

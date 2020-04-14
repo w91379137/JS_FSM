@@ -10,7 +10,6 @@ export class BasicFSMObject {
 
   // State(只能透過 Events 更改)
 
-  State: any; // 給子類自己選擇要哪個 enum
   StateChange = new Subject<{ from: any, to: any }>();
 
   // Extended states(只能透過 Events 更改)
