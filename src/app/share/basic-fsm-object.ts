@@ -9,9 +9,7 @@ import { Subject } from 'rxjs';
 export class BasicFSMObject {
 
   // State(只能透過 Events 更改)
-  // static AllState: any[] = []; // 給子類自己選擇要哪個 enum
-  static EventDictionary = {};
-  static GuardDictionary = {};
+  static FSMDict = {};
 
   pState: any;
   State: any; // 給子類自己選擇要哪個 enum
@@ -30,8 +28,9 @@ export class BasicFSMObject {
   // x log未通過的原因
 
   checkAll() {
+
     // tslint:disable-next-line:no-string-literal
-    const funcDataList = this.constructor['GuardDictionary'][this.State];
+    const funcDataList = ((this.constructor['FSMDict'] || {})['GuardDict'] || {})[this.State];
 
     if (!funcDataList) {
       // 不用 check 的 屬性

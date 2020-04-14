@@ -57,7 +57,9 @@ export function Event(
     descriptor: PropertyDescriptor,
   ) {
     // Write Table
-    const dict = target.constructor.EventDictionary;
+    const selfClass = target.constructor;
+    selfClass.FSMDict.EventDict = selfClass.FSMDict.EventDict || {};
+    const dict = selfClass.FSMDict.EventDict;
     // console.log(target.constructor);
     for (const ele of oneToArr(inState)) {
       const list = dict.hasOwnProperty(ele) ? dict[ele] : [];
@@ -92,7 +94,9 @@ export function Guard(
     descriptor: PropertyDescriptor,
   ) {
     // Write Table
-    const dict = target.constructor.GuardDictionary;
+    const selfClass = target.constructor;
+    selfClass.FSMDict.GuardDict = selfClass.FSMDict.GuardDict || {};
+    const dict = selfClass.FSMDict.GuardDict;
     // console.log(target.constructor);
     for (const ele of oneToArr(fromState)) {
       const list = dict.hasOwnProperty(ele) ? dict[ele] : [];

@@ -12,11 +12,9 @@ function getRole(state: RoleStatus) {
 describe(RoleFSM.name, () => {
 
   beforeAll(() => {
-    // 用來顯示 Roadmap
     // const testClass = RoleFSM;
     // console.log(testClass.name);
-    // console.log(`EventDictionary:${prettyPrintObj(testClass.EventDictionary)}`);
-    // console.log(`GuardDictionary:${prettyPrintObj(testClass.GuardDictionary)}`);
+    // console.log(`FSMDict:${prettyPrintObj(testClass.FSMDict)}`);
   });
 
   it('isActionPointFull', async (done) => {
