@@ -11,6 +11,17 @@ export enum On {
   AfterLeave = 'AfterLeave',
 }
 
+export enum FSMEventType {
+  EventAccept = 'EventAccept',
+  EventReject = 'EventReject',
+
+  GuardAccept = 'GuardAccept',
+  GuardReject = 'GuardReject',
+
+  BeforeTransition = 'BeforeTransition',
+  AfterTransition = 'AfterTransition',
+}
+
 function oneToArr(obj: any) {
   return Array.isArray(obj) ? obj : [obj];
 }
@@ -32,6 +43,18 @@ function classCheck(aClass: any) {
   return aClass;
 }
 
+function sendNotice(type: FSMEventType, funcName: string = '', arg: any[] = []) {
+  const subject = this[this.constructor.FSMDict.Notice];
+  if (!subject || !subject.next) {
+    return;
+  }
+  subject.next({
+    type,
+    funcName,
+    arg,
+  });
+}
+
 function checkGuards() {
   const funcDataList =
     this.constructor.FSMDict.GuardDict[this.State] || [];
@@ -39,15 +62,27 @@ function checkGuards() {
   for (const funcData of funcDataList) {
     const func = this[funcData.funcName];
     if (func) {
-      func.apply(this);
+      // 目前不考慮 檢查是否有多個 符合一個符合就停止
+      const isAccept = func.apply(this);
+      if (isAccept) {
+        break;
+      }
     } else {
       console.log(this, funcData);
     }
   }
 }
 
+function doTransition(toState) {
+  this.sendNotice(FSMEventType.BeforeTransition);
+  this[this.constructor.FSMDict.MainState] = toState;
+  this.sendNotice(FSMEventType.AfterTransition);
+}
+
 function instanceCheck(aInstance: any) {
+  aInstance.sendNotice = aInstance.sendNotice || sendNotice;
   aInstance.checkGuards = aInstance.checkGuards || checkGuards;
+  aInstance.doTransition = aInstance.doTransition || doTransition;
   return aInstance;
 }
 
@@ -105,16 +140,19 @@ export function Event(
     const originalMethod = descriptor.value;
     descriptor.value = function newMethod() {
       instanceCheck(this);
-      if (!oneToArr(inState).includes(this[selfClass.FSMDict.MainState])) {
-        return false;
-      }
 
-      const result = originalMethod.apply(this, arguments);
-      if (result) {
+      let isAccept = true;
+      isAccept = isAccept && oneToArr(inState).includes(this[selfClass.FSMDict.MainState]);
+      isAccept = isAccept && originalMethod.apply(this, arguments);
+
+      if (isAccept) {
+        this.sendNotice(FSMEventType.EventAccept, propertyKey, arguments);
         this.checkGuards();
+      } else {
+        this.sendNotice(FSMEventType.EventReject, propertyKey, arguments);
       }
 
-      return result;
+      return isAccept;
     };
   };
 }
@@ -144,20 +182,24 @@ export function Guard(
     // Replace
     const originalMethod = descriptor.value;
     descriptor.value = function newMethod() {
-      if (!oneToArr(fromState).includes(this[selfClass.FSMDict.MainState])) {
-        return false;
+
+      let isAccept = true;
+
+      // checkGuards 有挑選過 所這個條件 通常是成立的 如果有人直接呼叫 就會從這邊回絕
+      isAccept = isAccept && oneToArr(fromState).includes(this[selfClass.FSMDict.MainState]);
+      isAccept = isAccept && originalMethod.apply(this, arguments);
+
+      if (isAccept) {
+        this.sendNotice(FSMEventType.GuardAccept, propertyKey, arguments);
+        this.doTransition(toState);
+      } else {
+        this.sendNotice(FSMEventType.GuardReject, propertyKey, arguments);
       }
-      const result = originalMethod.apply(this, arguments);
-      if (result) {
-        this[selfClass.FSMDict.MainState] = toState;
-      }
-      return result;
+
+      return isAccept;
     };
   };
 }
-
-// ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
-// Method Decorator
 
 export function Listen(
   on: On,
@@ -182,25 +224,3 @@ export function Listen(
     }
   };
 }
-  // export function BeforeEnter(
-  //   state: any | any[],
-  // ) {
-  // };
-
-  // export function AfterEnter(
-  //   state: any | any[],
-  // ) {
-  // };
-
-  // export function BeforeLeave(
-  //   state: any | any[],
-  // ) {
-  // };
-
-  // export function AfterLeave(
-  //   state: any | any[],
-  // ) {
-  // };
-
-  // 把要用的表 集合到一個屬性
-
