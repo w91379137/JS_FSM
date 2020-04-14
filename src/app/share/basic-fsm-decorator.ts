@@ -2,8 +2,15 @@
 // https://www.cnblogs.com/Wayou/p/typescript_decorator.html
 // https://zhongsp.gitbooks.io/typescript-handbook/doc/handbook/Decorators.html
 
+import { prettyPrintObj } from './share-functions';
+
 function oneToArr(obj: any) {
   return Array.isArray(obj) ? obj : [obj];
+}
+
+export function prettyPrintFSM(aClass: any) {
+  console.log(aClass.name);
+  console.log(`FSMDict:${prettyPrintObj(aClass.FSMDict)}`);
 }
 
 function classCheck(aClass: any) {
