@@ -102,4 +102,28 @@ export function Guard(
       return result;
     };
   };
+
+  // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
+
+  // export function BeforeEnter(
+  //   state: any | any[],
+  // ) {
+  // };
+
+  // export function AfterEnter(
+  //   state: any | any[],
+  // ) {
+  // };
+
+  // export function BeforeLeave(
+  //   state: any | any[],
+  // ) {
+  // };
+
+  // export function AfterLeave(
+  //   state: any | any[],
+  // ) {
+  // };
+
+  // 把要用的表 集合到一個屬性
 }
