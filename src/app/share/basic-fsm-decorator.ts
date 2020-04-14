@@ -49,6 +49,7 @@ function sendNotice(type: FSMEventType, funcName: string = '', arg: any[] = []) 
     return;
   }
   subject.next({
+    self: this,
     type,
     funcName,
     arg,
@@ -73,9 +74,37 @@ function checkGuards() {
   }
 }
 
+interface ListenObj {
+  on: On;
+  state: any;
+  funcName: string;
+}
+
 function doTransition(toState) {
   this.sendNotice(FSMEventType.BeforeTransition);
+  const fromState = this[this.constructor.FSMDict.MainState];
+
+  const fromListen = (this.constructor.FSMDict.Listen[fromState] || []) as ListenObj[];
+  const toListen = (this.constructor.FSMDict.Listen[toState] || []) as ListenObj[];
+
+  fromListen
+    .filter(ele => (ele.state === fromState) && (ele.on === On.BeforeLeave))
+    .forEach(ele => this[ele.funcName].apply(this));
+
+  toListen
+    .filter(ele => (ele.state === toState) && (ele.on === On.BeforeEnter))
+    .forEach(ele => this[ele.funcName].apply(this));
+
   this[this.constructor.FSMDict.MainState] = toState;
+
+  fromListen
+    .filter(ele => (ele.state === fromState) && (ele.on === On.AfterLeave))
+    .forEach(ele => this[ele.funcName].apply(this));
+
+  toListen
+    .filter(ele => (ele.state === toState) && (ele.on === On.AfterEnter))
+    .forEach(ele => this[ele.funcName].apply(this));
+
   this.sendNotice(FSMEventType.AfterTransition);
 }
 
@@ -146,10 +175,10 @@ export function Event(
       isAccept = isAccept && originalMethod.apply(this, arguments);
 
       if (isAccept) {
-        this.sendNotice(FSMEventType.EventAccept, propertyKey, arguments);
+        this.sendNotice(FSMEventType.EventAccept, propertyKey, Array.from(arguments));
         this.checkGuards();
       } else {
-        this.sendNotice(FSMEventType.EventReject, propertyKey, arguments);
+        this.sendNotice(FSMEventType.EventReject, propertyKey, Array.from(arguments));
       }
 
       return isAccept;
@@ -190,10 +219,10 @@ export function Guard(
       isAccept = isAccept && originalMethod.apply(this, arguments);
 
       if (isAccept) {
-        this.sendNotice(FSMEventType.GuardAccept, propertyKey, arguments);
+        this.sendNotice(FSMEventType.GuardAccept, propertyKey, Array.from(arguments));
         this.doTransition(toState);
       } else {
-        this.sendNotice(FSMEventType.GuardReject, propertyKey, arguments);
+        this.sendNotice(FSMEventType.GuardReject, propertyKey, Array.from(arguments));
       }
 
       return isAccept;

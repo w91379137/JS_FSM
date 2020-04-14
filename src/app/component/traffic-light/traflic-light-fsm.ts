@@ -38,7 +38,10 @@ export class TraflicLightFSM {
   // Life Cycle
   constructor() {
     // tslint:disable-next-line:no-string-literal
-    console.log(TraflicLightFSM['FSMDict']);
+    // console.log(TraflicLightFSM['FSMDict']);
+    // this.Notice.subscribe(e => {
+    //   console.log(e);
+    // });
   }
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
