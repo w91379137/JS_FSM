@@ -6,6 +6,17 @@ function oneToArr(obj: any) {
   return Array.isArray(obj) ? obj : [obj];
 }
 
+// https://www.typescriptlang.org/docs/handbook/decorators.html
+// 啟動順序
+// Method Decorator > instance
+// Property Decorator > instance
+// Method Decorator > static
+// Property Decorator > static
+// Class Decorator
+
+// ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
+// Property Decorator
+
 export function State() {
   return function EStateFactory(
     target: any,
@@ -33,6 +44,9 @@ export function State() {
     });
   };
 }
+
+// ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
+// Method Decorator
 
 export function Event(
   inState: any | any[],
@@ -104,6 +118,7 @@ export function Guard(
   };
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
+  // Method Decorator
 
   // export function BeforeEnter(
   //   state: any | any[],
