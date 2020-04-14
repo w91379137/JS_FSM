@@ -4,6 +4,13 @@
 
 import { prettyPrintObj } from './share-functions';
 
+export enum On {
+  BeforeEnter = 'BeforeEnter',
+  AfterEnter = 'AfterEnter',
+  BeforeLeave = 'BeforeLeave',
+  AfterLeave = 'AfterLeave',
+}
+
 function oneToArr(obj: any) {
   return Array.isArray(obj) ? obj : [obj];
 }
@@ -17,8 +24,10 @@ function classCheck(aClass: any) {
   // 目前就依照 不同 Decorator 依照陣列 擺放
   aClass.FSMDict = aClass.FSMDict || {
     MainState: '',
+    Notice: '',
     EventDict: {},
     GuardDict: {},
+    Listen: {},
   };
   return aClass;
 }
@@ -28,7 +37,7 @@ function checkGuards() {
     this.constructor.FSMDict.GuardDict[this.State] || [];
 
   for (const funcData of funcDataList) {
-    const func = this[funcData.FuncName];
+    const func = this[funcData.funcName];
     if (func) {
       func.apply(this);
     } else {
@@ -59,6 +68,15 @@ export function State() {
     propertyKey: string | symbol,
   ) {
     classCheck(target.constructor).FSMDict.MainState = propertyKey;
+  };
+}
+
+export function Notice() {
+  return function EStateFactory(
+    target: any,
+    propertyKey: string | symbol,
+  ) {
+    classCheck(target.constructor).FSMDict.Notice = propertyKey;
   };
 }
 
@@ -118,7 +136,7 @@ export function Guard(
       const list = dict.hasOwnProperty(ele) ? dict[ele] : [];
       list.push({
         to: toState,
-        FuncName: propertyKey,
+        funcName: propertyKey,
       });
       dict[ele] = list;
     }
@@ -136,10 +154,34 @@ export function Guard(
       return result;
     };
   };
+}
 
-  // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
-  // Method Decorator
+// ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
+// Method Decorator
 
+export function Listen(
+  on: On,
+  state: any | any[],
+) {
+  return function ListenFactory(
+    target: any,
+    propertyKey: string,
+    descriptor: PropertyDescriptor,
+  ) {
+    // Write Table
+    const selfClass = classCheck(target.constructor);
+    const dict = selfClass.FSMDict.Listen;
+    for (const ele of oneToArr(state)) {
+      const list = dict.hasOwnProperty(ele) ? dict[ele] : [];
+      list.push({
+        on,
+        state,
+        funcName: propertyKey,
+      });
+      dict[ele] = list;
+    }
+  };
+}
   // export function BeforeEnter(
   //   state: any | any[],
   // ) {
@@ -161,4 +203,4 @@ export function Guard(
   // };
 
   // 把要用的表 集合到一個屬性
-}
+
