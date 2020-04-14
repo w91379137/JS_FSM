@@ -9,9 +9,7 @@ import { Subject } from 'rxjs';
 export class BasicFSMObject {
 
   // State(只能透過 Events 更改)
-  static FSMDict = {};
 
-  pState: any;
   State: any; // 給子類自己選擇要哪個 enum
   StateChange = new Subject<{ from: any, to: any }>();
 
@@ -27,27 +25,7 @@ export class BasicFSMObject {
   // v 通過後到哪個狀態
   // x log未通過的原因
 
-  checkAll() {
-
-    // tslint:disable-next-line:no-string-literal
-    const funcDataList = ((this.constructor['FSMDict'] || {})['GuardDict'] || {})[this.State];
-
-    if (!funcDataList) {
-      // 不用 check 的 屬性
-      // console.log(this, this.State);
-      return;
-    }
-
-    for (const funcData of funcDataList) {
-      const func = this[funcData.FuncName];
-      if (func) {
-        func.apply(this);
-      } else {
-        console.log(this, funcData);
-      }
-    }
-  }
-
-  // Actions and Transitions
+  // Actions
+  // Transitions
   // 依照事件給予 反應
 }

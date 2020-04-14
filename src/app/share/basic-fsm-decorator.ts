@@ -6,6 +6,32 @@ function oneToArr(obj: any) {
   return Array.isArray(obj) ? obj : [obj];
 }
 
+function classCheck(aClass: any) {
+  // 目前就依照 不同 Decorator 依照陣列 擺放
+  aClass.FSMDict = aClass.FSMDict || {
+    EventDict: {},
+    GuardDict: {},
+  };
+}
+
+function checkGuards() {
+  const funcDataList =
+    this.constructor.FSMDict.GuardDict[this.State] || [];
+
+  for (const funcData of funcDataList) {
+    const func = this[funcData.FuncName];
+    if (func) {
+      func.apply(this);
+    } else {
+      console.log(this, funcData);
+    }
+  }
+}
+
+function instanceCheck(aInstance: any) {
+  aInstance.checkGuards = aInstance.checkGuards || checkGuards;
+}
+
 // https://www.typescriptlang.org/docs/handbook/decorators.html
 // 啟動順序
 // Method Decorator > instance
@@ -25,14 +51,14 @@ export function State() {
 
     const val = target[propertyKey];
     const getter = function newGetter() {
-      if (this.pState === undefined) {
-        this.pState = val;
+      if (this.privateState === undefined) {
+        this.privateState = val;
       }
-      return this.pState;
+      return this.privateState;
     };
     const setter = function newSetter(next) {
-      const old = this.pState;
-      this.pState = next;
+      const old = this.privateState;
+      this.privateState = next;
       this.StateChange.next({ from: old, to: next });
     };
 
@@ -58,7 +84,7 @@ export function Event(
   ) {
     // Write Table
     const selfClass = target.constructor;
-    selfClass.FSMDict.EventDict = selfClass.FSMDict.EventDict || {};
+    classCheck(selfClass);
     const dict = selfClass.FSMDict.EventDict;
     // console.log(target.constructor);
     for (const ele of oneToArr(inState)) {
@@ -70,13 +96,14 @@ export function Event(
     // Replace
     const originalMethod = descriptor.value;
     descriptor.value = function newMethod() {
+      instanceCheck(this);
       if (!oneToArr(inState).includes(this.State)) {
         return false;
       }
 
       const result = originalMethod.apply(this, arguments);
       if (result) {
-        this.checkAll();
+        this.checkGuards();
       }
 
       return result;
@@ -95,7 +122,7 @@ export function Guard(
   ) {
     // Write Table
     const selfClass = target.constructor;
-    selfClass.FSMDict.GuardDict = selfClass.FSMDict.GuardDict || {};
+    classCheck(selfClass);
     const dict = selfClass.FSMDict.GuardDict;
     // console.log(target.constructor);
     for (const ele of oneToArr(fromState)) {

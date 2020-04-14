@@ -14,8 +14,6 @@ const AllRoleStatus = Object.keys(RoleStatus)
   .filter(value => !isNaN(Number(value)));
 export class RoleFSM extends BasicFSMObject {
 
-  static FSMDict = {}; // 必須有 不然會共用 super
-
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // State
   @State()
