@@ -82,7 +82,10 @@ export function Guard(
     // console.log(target.constructor);
     for (const ele of oneToArr(fromState)) {
       const list = dict.hasOwnProperty(ele) ? dict[ele] : [];
-      list.push(propertyKey);
+      list.push({
+        to: toState,
+        FuncName: propertyKey,
+      });
       dict[ele] = list;
     }
 

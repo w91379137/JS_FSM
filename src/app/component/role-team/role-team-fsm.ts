@@ -2,6 +2,7 @@ import { BasicFSMObject } from 'src/app/share/basic-fsm-object';
 import { State, Event, Guard } from 'src/app/share/basic-fsm-decorator';
 import { Subject } from 'rxjs';
 import { RoleFSM, RoleStatus } from '../role/role-fsm';
+import { random } from 'src/app/share/share-functions';
 
 export enum RoleTeamStatus {
   Idle = 0,
@@ -37,7 +38,7 @@ export class RoleTeamFSM extends BasicFSMObject {
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // Life Cycle
   constructor(
-    name: string,
+    name: string = '',
   ) {
     super();
     this.Name = name;
@@ -46,7 +47,7 @@ export class RoleTeamFSM extends BasicFSMObject {
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // Events
   @Event(AllRoleTeamStatus)
-  check(): boolean {
+  update(): boolean {
     return true;
   }
 
@@ -96,8 +97,4 @@ export class RoleTeamFSM extends BasicFSMObject {
     const roles = this.teamMenber.filter(role => role.State !== RoleStatus.Die);
     return roles[random(0, roles.length)];
   }
-}
-
-function random(min, max) {
-  return Math.floor(Math.random() * (max - min)) + min;
 }

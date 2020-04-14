@@ -29,7 +29,8 @@ export class RoleFSM extends BasicFSMObject {
   /** 名稱 */
   Name = '';
 
-  // 職業
+  /** 職業 */
+  Job = '';
 
   /** 行動值 */
   ActionPoint = 100;
@@ -40,10 +41,13 @@ export class RoleFSM extends BasicFSMObject {
   /** 魔力值 */
   MagicPoint = 100;
 
+  /** 發動攻擊中 */
+  isWorking = false;
+
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // Life Cycle
   constructor(
-    name: string,
+    name: string = '',
   ) {
     super();
     this.Name = name;
@@ -62,13 +66,13 @@ export class RoleFSM extends BasicFSMObject {
   @Event(RoleStatus.Ready)
   startWork(cost: number) {
     this.ActionPoint -= cost;
-    this.State = RoleStatus.Work;
+    this.isWorking = true;
     return true;
   }
 
   @Event(RoleStatus.Work)
   endWork() {
-    this.State = RoleStatus.Idle;
+    this.isWorking = false;
     return true;
   }
 
@@ -84,6 +88,16 @@ export class RoleFSM extends BasicFSMObject {
   @Guard(RoleStatus.Idle, RoleStatus.Ready)
   isActionPointFull(): boolean {
     return this.ActionPoint >= 100;
+  }
+
+  @Guard(RoleStatus.Ready, RoleStatus.Work)
+  isStartWork(): boolean {
+    return this.isWorking;
+  }
+
+  @Guard(RoleStatus.Work, RoleStatus.Idle)
+  isEndWork(): boolean {
+    return !this.isWorking;
   }
 
   @Guard([RoleStatus.Idle, RoleStatus.Ready, RoleStatus.Work], RoleStatus.Die)

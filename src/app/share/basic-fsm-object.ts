@@ -31,20 +31,20 @@ export class BasicFSMObject {
 
   checkAll() {
     // tslint:disable-next-line:no-string-literal
-    const funcNameList = this.constructor['GuardDictionary'][this.State];
+    const funcDataList = this.constructor['GuardDictionary'][this.State];
 
-    if (!funcNameList) {
+    if (!funcDataList) {
       // 不用 check 的 屬性
       // console.log(this, this.State);
       return;
     }
 
-    for (const funcName of funcNameList) {
-      const func = this[funcName];
+    for (const funcData of funcDataList) {
+      const func = this[funcData.FuncName];
       if (func) {
         func.apply(this);
       } else {
-        console.log(this, funcName);
+        console.log(this, funcData);
       }
     }
   }
