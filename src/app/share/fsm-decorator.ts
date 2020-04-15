@@ -3,7 +3,7 @@
 // https://zhongsp.gitbooks.io/typescript-handbook/doc/handbook/Decorators.html
 
 import { oneToArr } from './share-functions';
-import { FSMEventType, On } from './fsm-interface';
+import { FSMEventType, On, FSMClass } from './fsm-interface';
 
 function classCheck(aClass: any) {
   // 目前就依照 不同 Decorator 依照陣列 擺放
@@ -12,9 +12,9 @@ function classCheck(aClass: any) {
     Notice: '',
     EventDict: {},
     GuardDict: {},
-    Listen: {},
+    ListenList: [],
   };
-  return aClass;
+  return aClass as FSMClass;
 }
 
 function sendNotice(type: FSMEventType, funcName: string = '', arg: any[] = []) {
@@ -48,36 +48,23 @@ function checkGuards() {
   }
 }
 
-interface ListenObj {
-  on: On;
-  state: any;
-  funcName: string;
-}
-
 function doTransition(toState) {
   this.sendNotice(FSMEventType.BeforeTransition);
   const fromState = this[this.constructor.FSMDict.MainState];
 
-  const fromListen = (this.constructor.FSMDict.Listen[fromState] || []) as ListenObj[];
-  const toListen = (this.constructor.FSMDict.Listen[toState] || []) as ListenObj[];
+  const listenList = classCheck(this.constructor).FSMDict.ListenList;
 
-  fromListen
-    .filter(ele => (ele.state === fromState) && (ele.on === On.BeforeLeave))
-    .forEach(ele => this[ele.funcName].apply(this));
-
-  toListen
-    .filter(ele => (ele.state === toState) && (ele.on === On.BeforeEnter))
-    .forEach(ele => this[ele.funcName].apply(this));
+  listenList.filter(ele =>
+    ((ele.on === On.BeforeLeave) && (ele.state === fromState)) ||
+    ((ele.on === On.BeforeEnter) && (ele.state === toState))
+  ).forEach(ele => this[ele.funcName].apply(this));
 
   this[this.constructor.FSMDict.MainState] = toState;
 
-  fromListen
-    .filter(ele => (ele.state === fromState) && (ele.on === On.AfterLeave))
-    .forEach(ele => this[ele.funcName].apply(this));
-
-  toListen
-    .filter(ele => (ele.state === toState) && (ele.on === On.AfterEnter))
-    .forEach(ele => this[ele.funcName].apply(this));
+  listenList.filter(ele =>
+    ((ele.on === On.AfterLeave) && (ele.state === fromState)) ||
+    ((ele.on === On.AfterEnter) && (ele.state === toState))
+  ).forEach(ele => this[ele.funcName].apply(this));
 
   this.sendNotice(FSMEventType.AfterTransition);
 }
@@ -101,18 +88,18 @@ function instanceCheck(aInstance: any) {
 // Property Decorator
 
 export function State() {
-  return function EStateFactory(
+  return function StateFactory(
     target: any,
-    propertyKey: string | symbol,
+    propertyKey: string,
   ) {
     classCheck(target.constructor).FSMDict.MainState = propertyKey;
   };
 }
 
 export function Notice() {
-  return function EStateFactory(
+  return function NoticeFactory(
     target: any,
-    propertyKey: string | symbol,
+    propertyKey: string,
   ) {
     classCheck(target.constructor).FSMDict.Notice = propertyKey;
   };
@@ -215,15 +202,13 @@ export function Listen(
   ) {
     // Write Table
     const selfClass = classCheck(target.constructor);
-    const dict = selfClass.FSMDict.Listen;
-    for (const ele of oneToArr(state)) {
-      const list = dict.hasOwnProperty(ele) ? dict[ele] : [];
+    const list = selfClass.FSMDict.ListenList;
+    oneToArr(state).forEach(ele => {
       list.push({
         on,
-        state,
+        state: ele,
         funcName: propertyKey,
       });
-      dict[ele] = list;
-    }
+    });
   };
 }

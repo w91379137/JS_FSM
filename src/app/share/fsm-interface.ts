@@ -15,3 +15,19 @@ export enum FSMEventType {
   BeforeTransition = 'BeforeTransition',
   AfterTransition = 'AfterTransition',
 }
+
+export interface FSMClass {
+  FSMDict: {
+    MainState: string,
+    Notice: string,
+    EventDict: {},
+    GuardDict: {},
+    ListenList: ListenInfo[],
+  };
+}
+
+interface ListenInfo {
+  on: On;
+  state: any;
+  funcName: string;
+}
