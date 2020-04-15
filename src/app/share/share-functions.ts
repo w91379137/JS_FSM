@@ -5,6 +5,10 @@ export function prettyPrintObj(obj: any): string {
   return JSON.stringify(obj, undefined, 2);
 }
 
+export function oneToArr(obj: any) {
+  return Array.isArray(obj) ? obj : [obj];
+}
+
 export function random(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }

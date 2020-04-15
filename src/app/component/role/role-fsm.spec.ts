@@ -1,6 +1,6 @@
 
 import { RoleFSM, RoleStatus } from './role-fsm';
-import { prettyPrintObj } from 'src/app/share/share-functions';
+import { prettyPrintFSM } from 'src/app/share/fsm-debug';
 // ng test --main ./src/app/component/role/role-fsm.spec.ts
 
 function getRole(state: RoleStatus) {
@@ -9,15 +9,9 @@ function getRole(state: RoleStatus) {
   return fsm;
 }
 
-describe(RoleFSM.name, () => {
+// prettyPrintFSM(RoleFSM);
 
-  beforeAll(() => {
-    // 用來顯示 Roadmap
-    // const testClass = RoleFSM;
-    // console.log(testClass.name);
-    // console.log(`EventDictionary:${prettyPrintObj(testClass.EventDictionary)}`);
-    // console.log(`GuardDictionary:${prettyPrintObj(testClass.GuardDictionary)}`);
-  });
+describe(RoleFSM.name, () => {
 
   it('isActionPointFull', async (done) => {
     const fsm = getRole(RoleStatus.Idle);

@@ -1,25 +1,21 @@
-import { BasicFSMObject } from '../../share/basic-fsm-object';
-import { State, Event, Guard } from 'src/app/share/basic-fsm-decorator';
+
+import { State, Notice, Listen, Event, Guard } from 'src/app/share/fsm-decorator';
+import { On } from 'src/app/share/fsm-interface';
 import { Subject } from 'rxjs';
 
 export enum LightStatus {
-  Green = 0,
-  Yellow,
-  Red,
+  Green = 'Green',
+  Yellow = 'Yellow',
+  Red = 'Red',
 }
 
-const AllLightStatus = Object.keys(LightStatus)
-  .map(key => LightStatus[key])
-  .filter(value => !isNaN(Number(value)));
+const AllLightStatus = Object.keys(LightStatus);
 
 const GreenTime = 10;
 const YellowTime = 10;
 const RedTime = 10;
 
-export class TraflicLightFSM extends BasicFSMObject {
-
-  static EventDictionary = {}; // 必須有 不然會共用 super
-  static GuardDictionary = {}; // 必須有 不然會共用 super
+export class TraflicLightFSM {
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // State
@@ -30,7 +26,8 @@ export class TraflicLightFSM extends BasicFSMObject {
   @State()
   State = LightStatus.Green;
 
-  StateChange = new Subject<{ from: LightStatus, to: LightStatus }>();
+  @Notice()
+  Notice = new Subject<any>();
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // Extended states
@@ -41,28 +38,11 @@ export class TraflicLightFSM extends BasicFSMObject {
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // Life Cycle
   constructor() {
-    super();
-    // console.log('EventDictionary', TraflicLightFSM.EventDictionary);
-    // console.log('GuardDictionary', TraflicLightFSM.GuardDictionary);
-    this.setupClear();
-  }
-
-  setupClear() {
-    this.StateChange.subscribe(e => {
-      switch (e.to) {
-        case LightStatus.Green:
-          this.InGreenTime = 0;
-          break;
-
-        case LightStatus.Yellow:
-          this.InYellowTime = 0;
-          break;
-
-        case LightStatus.Red:
-          this.InRedTime = 0;
-          break;
-      }
-    });
+    // tslint:disable-next-line:no-string-literal
+    // console.log(TraflicLightFSM['FSMDict']);
+    // this.Notice.subscribe(e => {
+    //   console.log(e);
+    // });
   }
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
@@ -81,16 +61,31 @@ export class TraflicLightFSM extends BasicFSMObject {
     }
   }
 
+  @Listen(On.BeforeEnter, LightStatus.Green)
+  clearInGreenTime() {
+    this.InGreenTime = 0;
+  }
+
   @Event(LightStatus.Green)
   increaseGreenTime(): boolean {
     this.InGreenTime++;
     return true;
   }
 
+  @Listen(On.BeforeEnter, LightStatus.Yellow)
+  clearInYellowTime() {
+    this.InYellowTime = 0;
+  }
+
   @Event(LightStatus.Yellow)
   increaseYellowTime(): boolean {
     this.InYellowTime++;
     return true;
+  }
+
+  @Listen(On.BeforeEnter, LightStatus.Red)
+  clearInRedTime() {
+    this.InRedTime = 0;
   }
 
   @Event(LightStatus.Red)

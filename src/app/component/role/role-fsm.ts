@@ -1,5 +1,4 @@
-import { BasicFSMObject } from 'src/app/share/basic-fsm-object';
-import { State, Event, Guard } from 'src/app/share/basic-fsm-decorator';
+import { State, Event, Guard } from 'src/app/share/fsm-decorator';
 import { Subject } from 'rxjs';
 
 export enum RoleStatus {
@@ -12,10 +11,7 @@ export enum RoleStatus {
 const AllRoleStatus = Object.keys(RoleStatus)
   .map(key => RoleStatus[key])
   .filter(value => !isNaN(Number(value)));
-export class RoleFSM extends BasicFSMObject {
-
-  static EventDictionary = {}; // 必須有 不然會共用 super
-  static GuardDictionary = {}; // 必須有 不然會共用 super
+export class RoleFSM {
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // State
@@ -49,7 +45,6 @@ export class RoleFSM extends BasicFSMObject {
   constructor(
     name: string = '',
   ) {
-    super();
     this.Name = name;
     // console.log(AllRoleStatus);
     // console.log(RoleFSM.GuardDictionary);
