@@ -2,30 +2,8 @@
 // https://www.cnblogs.com/Wayou/p/typescript_decorator.html
 // https://zhongsp.gitbooks.io/typescript-handbook/doc/handbook/Decorators.html
 
-import { prettyPrintObj, oneToArr } from './share-functions';
-
-export enum On {
-  BeforeEnter = 'BeforeEnter',
-  AfterEnter = 'AfterEnter',
-  BeforeLeave = 'BeforeLeave',
-  AfterLeave = 'AfterLeave',
-}
-
-export enum FSMEventType {
-  EventAccept = 'EventAccept',
-  EventReject = 'EventReject',
-
-  GuardAccept = 'GuardAccept',
-  GuardReject = 'GuardReject',
-
-  BeforeTransition = 'BeforeTransition',
-  AfterTransition = 'AfterTransition',
-}
-
-export function prettyPrintFSM(aClass: any) {
-  console.log(aClass.name);
-  console.log(`FSMDict:${prettyPrintObj(aClass.FSMDict)}`);
-}
+import { oneToArr } from './share-functions';
+import { FSMEventType, On } from './fsm-interface';
 
 function classCheck(aClass: any) {
   // 目前就依照 不同 Decorator 依照陣列 擺放
