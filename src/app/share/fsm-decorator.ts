@@ -3,11 +3,11 @@
 // https://zhongsp.gitbooks.io/typescript-handbook/doc/handbook/Decorators.html
 
 import { oneToArr } from './share-functions';
-import { FSMEventType, On, FSMClass, DefaultFSMDict } from './fsm-interface';
+import { FSMEventType, On, FSMClass, getDefaultFSMDict } from './fsm-interface';
 
 function classCheck(aClass: any) {
   // 目前就依照 不同 Decorator 依照陣列 擺放
-  aClass.FSMDict = aClass.FSMDict || DefaultFSMDict;
+  aClass.FSMDict = aClass.FSMDict || getDefaultFSMDict();
   return aClass as FSMClass;
 }
 
@@ -39,7 +39,7 @@ function checkGuards() {
 
         const func = this[guardInfo.funcName];
         if (!func) {
-          console.log(this, guardInfo); // 不應該
+          console.log('No func for name', this, guardInfo); // 不應該
           return isStop;
         }
 

@@ -1,5 +1,4 @@
-import { BasicFSMObject } from 'src/app/share/fsm-object';
-import { State, Event, Guard } from 'src/app/share/fsm-decorator';
+import { State, Event, Guard, Notice } from 'src/app/share/fsm-decorator';
 import { Subject } from 'rxjs';
 import { RoleFSM, RoleStatus } from '../role/role-fsm';
 import { random } from 'src/app/share/share-functions';
@@ -15,16 +14,15 @@ const AllRoleTeamStatus = Object.keys(RoleTeamStatus)
   .map(key => RoleTeamStatus[key])
   .filter(value => !isNaN(Number(value)));
 
-export class RoleTeamFSM extends BasicFSMObject {
-
-  static EventDictionary = {}; // 必須有 不然會共用 super
-  static GuardDictionary = {}; // 必須有 不然會共用 super
+export class RoleTeamFSM {
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // State
   @State()
   State = RoleTeamStatus.Idle;
-  StateChange = new Subject<{ from: RoleTeamStatus, to: RoleTeamStatus }>();
+
+  @Notice()
+  StateChange = new Subject<any>();
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // Extended states
@@ -40,7 +38,6 @@ export class RoleTeamFSM extends BasicFSMObject {
   constructor(
     name: string = '',
   ) {
-    super();
     this.Name = name;
   }
 
@@ -61,6 +58,12 @@ export class RoleTeamFSM extends BasicFSMObject {
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // Guard conditions
 
+  // 先檢查是否全死了
+  @Guard([RoleTeamStatus.Idle, RoleTeamStatus.Ready, RoleTeamStatus.Work], RoleTeamStatus.End)
+  isAllDie(): boolean {
+    return !this.teamMenber.find(role => role.State !== RoleStatus.Die);
+  }
+
   @Guard(RoleTeamStatus.Idle, RoleTeamStatus.Ready)
   isAnyoneReady(): boolean {
     return !!this.teamMenber.find(role => role.State === RoleStatus.Ready);
@@ -79,11 +82,6 @@ export class RoleTeamFSM extends BasicFSMObject {
   @Guard(RoleTeamStatus.Work, RoleTeamStatus.Idle)
   isNobodyWork(): boolean {
     return !this.teamMenber.find(role => role.State === RoleStatus.Work);
-  }
-
-  @Guard([RoleTeamStatus.Idle, RoleTeamStatus.Ready, RoleTeamStatus.Work], RoleTeamStatus.End)
-  isAllDie(): boolean {
-    return !this.teamMenber.find(role => role.State !== RoleStatus.Die);
   }
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====

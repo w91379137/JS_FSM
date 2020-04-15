@@ -26,12 +26,14 @@ export interface FSMClass {
   };
 }
 
-export const DefaultFSMDict = {
-  MainState: '',
-  Notice: '',
-  EventList: [],
-  GuardList: [],
-  ListenList: [],
+export function getDefaultFSMDict() {
+  return {
+    MainState: '',
+    Notice: '',
+    EventList: [],
+    GuardList: [],
+    ListenList: [],
+  };
 };
 
 interface EventInfo {
