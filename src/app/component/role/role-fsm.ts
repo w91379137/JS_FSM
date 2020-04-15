@@ -1,4 +1,4 @@
-import { State, Event, Guard } from 'src/app/share/basic-fsm-decorator';
+import { State, Event, Guard } from 'src/app/share/fsm-decorator';
 import { Subject } from 'rxjs';
 
 export enum RoleStatus {

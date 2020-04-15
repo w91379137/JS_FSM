@@ -2,7 +2,7 @@
 // https://www.cnblogs.com/Wayou/p/typescript_decorator.html
 // https://zhongsp.gitbooks.io/typescript-handbook/doc/handbook/Decorators.html
 
-import { prettyPrintObj } from './share-functions';
+import { prettyPrintObj, oneToArr } from './share-functions';
 
 export enum On {
   BeforeEnter = 'BeforeEnter',
@@ -20,10 +20,6 @@ export enum FSMEventType {
 
   BeforeTransition = 'BeforeTransition',
   AfterTransition = 'AfterTransition',
-}
-
-function oneToArr(obj: any) {
-  return Array.isArray(obj) ? obj : [obj];
 }
 
 export function prettyPrintFSM(aClass: any) {

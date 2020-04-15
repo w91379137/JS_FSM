@@ -1,5 +1,5 @@
-import { BasicFSMObject } from 'src/app/share/basic-fsm-object';
-import { State, Event, Guard } from 'src/app/share/basic-fsm-decorator';
+import { BasicFSMObject } from 'src/app/share/fsm-object';
+import { State, Event, Guard } from 'src/app/share/fsm-decorator';
 import { Subject } from 'rxjs';
 import { RoleFSM, RoleStatus } from '../role/role-fsm';
 import { random } from 'src/app/share/share-functions';

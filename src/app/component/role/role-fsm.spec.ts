@@ -1,6 +1,6 @@
 
 import { RoleFSM, RoleStatus } from './role-fsm';
-import { prettyPrintFSM } from 'src/app/share/basic-fsm-decorator';
+import { prettyPrintFSM } from 'src/app/share/fsm-decorator';
 // ng test --main ./src/app/component/role/role-fsm.spec.ts
 
 function getRole(state: RoleStatus) {

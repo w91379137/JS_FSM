@@ -1,5 +1,5 @@
 
-import { State, Event, Guard, Notice, Listen, On } from 'src/app/share/basic-fsm-decorator';
+import { State, Notice, On, Listen, Event, Guard } from 'src/app/share/fsm-decorator';
 import { Subject } from 'rxjs';
 
 export enum LightStatus {
