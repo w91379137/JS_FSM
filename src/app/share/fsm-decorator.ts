@@ -3,23 +3,17 @@
 // https://zhongsp.gitbooks.io/typescript-handbook/doc/handbook/Decorators.html
 
 import { oneToArr } from './share-functions';
-import { FSMEventType, On, FSMClass } from './fsm-interface';
+import { FSMEventType, On, FSMClass, DefaultFSMDict } from './fsm-interface';
 
 function classCheck(aClass: any) {
   // 目前就依照 不同 Decorator 依照陣列 擺放
-  aClass.FSMDict = aClass.FSMDict || {
-    MainState: '',
-    Notice: '',
-    EventList: [],
-    GuardDict: {},
-    ListenList: [],
-  };
+  aClass.FSMDict = aClass.FSMDict || DefaultFSMDict;
   return aClass as FSMClass;
 }
 
 function sendNotice(type: FSMEventType, funcName: string = '', arg: any[] = []) {
   const subject = this[this.constructor.FSMDict.Notice];
-  if (!subject || !subject.next) {
+  if (!(subject && subject.next)) {
     return;
   }
   subject.next({
@@ -31,11 +25,11 @@ function sendNotice(type: FSMEventType, funcName: string = '', arg: any[] = []) 
 }
 
 function checkGuards() {
-  const funcDataList =
-    this.constructor.FSMDict.GuardDict[this.State] || [];
 
-  for (const funcData of funcDataList) {
-    const func = this[funcData.funcName];
+  const guardList = classCheck(this.constructor).FSMDict.GuardList;
+
+  for (const guardInfo of guardList) {
+    const func = this[guardInfo.funcName];
     if (func) {
       // 目前不考慮 檢查是否有多個 符合一個符合就停止
       const isAccept = func.apply(this);
@@ -43,7 +37,7 @@ function checkGuards() {
         break;
       }
     } else {
-      console.log(this, funcData);
+      console.log(this, guardInfo);
     }
   }
 }
@@ -149,8 +143,8 @@ export function Event(
 }
 
 export function Guard(
-  fromState: any | any[],
-  toState: any,
+  from: any | any[],
+  to: any,
 ) {
   return function GuardFactory(
     target: any,
@@ -159,16 +153,15 @@ export function Guard(
   ) {
     // Write Table
     const selfClass = classCheck(target.constructor);
-    const dict = selfClass.FSMDict.GuardDict;
-    // console.log(target.constructor);
-    for (const ele of oneToArr(fromState)) {
-      const list = dict.hasOwnProperty(ele) ? dict[ele] : [];
+    const list = selfClass.FSMDict.GuardList;
+
+    oneToArr(from).forEach(ele => {
       list.push({
-        to: toState,
+        from: ele,
+        to,
         funcName: propertyKey,
       });
-      dict[ele] = list;
-    }
+    });
 
     // Replace
     const originalMethod = descriptor.value;
@@ -176,13 +169,17 @@ export function Guard(
 
       let isAccept = true;
 
-      // checkGuards 有挑選過 所這個條件 通常是成立的 如果有人直接呼叫 就會從這邊回絕
-      isAccept = isAccept && oneToArr(fromState).includes(this[selfClass.FSMDict.MainState]);
+      isAccept = isAccept && oneToArr(from).includes(this[selfClass.FSMDict.MainState]);
+      if (!isAccept) {
+        // 狀態不合 不用 sendNotice
+        return isAccept;
+      }
+
       isAccept = isAccept && originalMethod.apply(this, arguments);
 
       if (isAccept) {
         this.sendNotice(FSMEventType.GuardAccept, propertyKey, Array.from(arguments));
-        this.doTransition(toState);
+        this.doTransition(to);
       } else {
         this.sendNotice(FSMEventType.GuardReject, propertyKey, Array.from(arguments));
       }

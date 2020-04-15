@@ -21,13 +21,27 @@ export interface FSMClass {
     MainState: string,
     Notice: string,
     EventList: EventInfo[],
-    GuardDict: {},
+    GuardList: GuardInfo[],
     ListenList: ListenInfo[],
   };
 }
 
+export const DefaultFSMDict = {
+  MainState: '',
+  Notice: '',
+  EventList: [],
+  GuardList: [],
+  ListenList: [],
+};
+
 interface EventInfo {
   state: any;
+  funcName: string;
+}
+
+interface GuardInfo {
+  from: any;
+  to: any;
   funcName: string;
 }
 
