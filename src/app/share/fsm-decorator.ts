@@ -10,7 +10,7 @@ function classCheck(aClass: any) {
   aClass.FSMDict = aClass.FSMDict || {
     MainState: '',
     Notice: '',
-    EventDict: {},
+    EventList: [],
     GuardDict: {},
     ListenList: [],
   };
@@ -109,7 +109,7 @@ export function Notice() {
 // Method Decorator
 
 export function Event(
-  inState: any | any[],
+  state: any | any[],
 ) {
   return function EventFactory(
     target: any,
@@ -118,13 +118,14 @@ export function Event(
   ) {
     // Write Table
     const selfClass = classCheck(target.constructor);
-    const dict = selfClass.FSMDict.EventDict;
-    // console.log(target.constructor);
-    for (const ele of oneToArr(inState)) {
-      const list = dict.hasOwnProperty(ele) ? dict[ele] : [];
-      list.push(propertyKey);
-      dict[ele] = list;
-    }
+    const list = selfClass.FSMDict.EventList;
+
+    oneToArr(state).forEach(ele => {
+      list.push({
+        state: ele,
+        funcName: propertyKey,
+      });
+    });
 
     // Replace
     const originalMethod = descriptor.value;
@@ -132,7 +133,7 @@ export function Event(
       instanceCheck(this);
 
       let isAccept = true;
-      isAccept = isAccept && oneToArr(inState).includes(this[selfClass.FSMDict.MainState]);
+      isAccept = isAccept && oneToArr(state).includes(this[selfClass.FSMDict.MainState]);
       isAccept = isAccept && originalMethod.apply(this, arguments);
 
       if (isAccept) {

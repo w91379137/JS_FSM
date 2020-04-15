@@ -20,10 +20,15 @@ export interface FSMClass {
   FSMDict: {
     MainState: string,
     Notice: string,
-    EventDict: {},
+    EventList: EventInfo[],
     GuardDict: {},
     ListenList: ListenInfo[],
   };
+}
+
+interface EventInfo {
+  state: any;
+  funcName: string;
 }
 
 interface ListenInfo {
