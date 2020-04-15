@@ -6,6 +6,10 @@ import { prettyPrintFSM } from 'src/app/share/fsm-debug';
 function getRole(state: RoleStatus) {
   const fsm = new RoleFSM();
   fsm.State = state;
+  // fsm.StateChange.subscribe(e => {
+  //   e.self = Object.assign({}, e.self);
+  //   console.log(e);
+  // });
   return fsm;
 }
 
@@ -46,6 +50,7 @@ describe(RoleFSM.name, () => {
   it('isDie', async (done) => {
     {
       const fsm = getRole(RoleStatus.Idle);
+      fsm.ActionPoint = 0;
 
       const isDo = fsm.getDamage(100);
 
@@ -64,6 +69,7 @@ describe(RoleFSM.name, () => {
 
     {
       const fsm = getRole(RoleStatus.Work);
+      fsm.isWorking = true;
 
       const isDo = fsm.getDamage(100);
 

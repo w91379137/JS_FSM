@@ -1,5 +1,6 @@
 import { State, Event, Guard } from 'src/app/share/fsm-decorator';
 import { Subject } from 'rxjs';
+import { Notice } from '../../share/fsm-decorator';
 
 export enum RoleStatus {
   Idle = 0,
@@ -17,7 +18,9 @@ export class RoleFSM {
   // State
   @State()
   State = RoleStatus.Idle;
-  StateChange = new Subject<{ from: RoleStatus, to: RoleStatus }>();
+
+  @Notice()
+  StateChange = new Subject<any>();
 
   // ====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====.====
   // Extended states
