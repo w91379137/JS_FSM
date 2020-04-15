@@ -35,18 +35,18 @@ export const DefaultFSMDict = {
 };
 
 interface EventInfo {
-  state: any;
+  state: any[];
   funcName: string;
 }
 
 interface GuardInfo {
-  from: any;
+  from: any[];
   to: any;
   funcName: string;
 }
 
 interface ListenInfo {
   on: On;
-  state: any;
+  state: any[];
   funcName: string;
 }

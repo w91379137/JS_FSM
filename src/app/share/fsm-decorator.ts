@@ -26,20 +26,28 @@ function sendNotice(type: FSMEventType, funcName: string = '', arg: any[] = []) 
 
 function checkGuards() {
 
-  const guardList = classCheck(this.constructor).FSMDict.GuardList;
+  const selfClass = classCheck(this.constructor);
+  const guardList = selfClass.FSMDict.GuardList;
+  const state = this[selfClass.FSMDict.MainState];
+  guardList
+    .filter(ele => ele.from.includes(state))
+    .reduce(
+      (isStop, guardInfo) => {
+        if (isStop) {
+          return isStop;
+        }
 
-  for (const guardInfo of guardList) {
-    const func = this[guardInfo.funcName];
-    if (func) {
-      // 目前不考慮 檢查是否有多個 符合一個符合就停止
-      const isAccept = func.apply(this);
-      if (isAccept) {
-        break;
-      }
-    } else {
-      console.log(this, guardInfo);
-    }
-  }
+        const func = this[guardInfo.funcName];
+        if (!func) {
+          console.log(this, guardInfo); // 不應該
+          return isStop;
+        }
+
+        // 目前不考慮 檢查是否有多個 符合一個符合就停止
+        return func.apply(this);
+      },
+      false
+    );
 }
 
 function doTransition(toState) {
@@ -49,15 +57,15 @@ function doTransition(toState) {
   const listenList = classCheck(this.constructor).FSMDict.ListenList;
 
   listenList.filter(ele =>
-    ((ele.on === On.BeforeLeave) && (ele.state === fromState)) ||
-    ((ele.on === On.BeforeEnter) && (ele.state === toState))
+    ((ele.on === On.BeforeLeave) && ele.state.includes(fromState)) ||
+    ((ele.on === On.BeforeEnter) && ele.state.includes(toState))
   ).forEach(ele => this[ele.funcName].apply(this));
 
   this[this.constructor.FSMDict.MainState] = toState;
 
   listenList.filter(ele =>
-    ((ele.on === On.AfterLeave) && (ele.state === fromState)) ||
-    ((ele.on === On.AfterEnter) && (ele.state === toState))
+    ((ele.on === On.AfterLeave) && ele.state.includes(fromState)) ||
+    ((ele.on === On.AfterEnter) && ele.state.includes(toState))
   ).forEach(ele => this[ele.funcName].apply(this));
 
   this.sendNotice(FSMEventType.AfterTransition);
@@ -110,15 +118,13 @@ export function Event(
     propertyKey: string,
     descriptor: PropertyDescriptor,
   ) {
+    const states = oneToArr(state);
+
     // Write Table
     const selfClass = classCheck(target.constructor);
-    const list = selfClass.FSMDict.EventList;
-
-    oneToArr(state).forEach(ele => {
-      list.push({
-        state: ele,
-        funcName: propertyKey,
-      });
+    selfClass.FSMDict.EventList.push({
+      state: states,
+      funcName: propertyKey,
     });
 
     // Replace
@@ -127,7 +133,7 @@ export function Event(
       instanceCheck(this);
 
       let isAccept = true;
-      isAccept = isAccept && oneToArr(state).includes(this[selfClass.FSMDict.MainState]);
+      isAccept = isAccept && states.includes(this[selfClass.FSMDict.MainState]);
       isAccept = isAccept && originalMethod.apply(this, arguments);
 
       if (isAccept) {
@@ -151,16 +157,14 @@ export function Guard(
     propertyKey: string,
     descriptor: PropertyDescriptor,
   ) {
+    const states = oneToArr(from);
+
     // Write Table
     const selfClass = classCheck(target.constructor);
-    const list = selfClass.FSMDict.GuardList;
-
-    oneToArr(from).forEach(ele => {
-      list.push({
-        from: ele,
-        to,
-        funcName: propertyKey,
-      });
+    selfClass.FSMDict.GuardList.push({
+      from: states,
+      to,
+      funcName: propertyKey,
     });
 
     // Replace
@@ -169,9 +173,9 @@ export function Guard(
 
       let isAccept = true;
 
-      isAccept = isAccept && oneToArr(from).includes(this[selfClass.FSMDict.MainState]);
+      isAccept = isAccept && states.includes(this[selfClass.FSMDict.MainState]);
       if (!isAccept) {
-        // 狀態不合 不用 sendNotice
+        // not in states no sendNotice
         return isAccept;
       }
 
@@ -198,15 +202,14 @@ export function Listen(
     propertyKey: string,
     descriptor: PropertyDescriptor,
   ) {
+    const states = oneToArr(state);
+
     // Write Table
     const selfClass = classCheck(target.constructor);
-    const list = selfClass.FSMDict.ListenList;
-    oneToArr(state).forEach(ele => {
-      list.push({
-        on,
-        state: ele,
-        funcName: propertyKey,
-      });
+    selfClass.FSMDict.ListenList.push({
+      on,
+      state: states,
+      funcName: propertyKey,
     });
   };
 }
